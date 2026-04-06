@@ -27,6 +27,7 @@ import AutoPenaltyScanner from './pages/AutoPenaltyScanner';
 import ReconciliationPage from './pages/ReconciliationPage';
 import PayoutRoadmap from './pages/PayoutRoadmap';
 import MemberContributionHistory from './pages/MemberContributionHistory';
+import CashFlowForecast from './pages/CashFlowForecast';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
       <Route path="/reconciliation" element={<ReconciliationPage />} />
       <Route path="/payout-roadmap" element={<PayoutRoadmap />} />
       <Route path="/member-history" element={<MemberContributionHistory />} />
+      <Route path="/cash-flow-forecast" element={<CashFlowForecast />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
