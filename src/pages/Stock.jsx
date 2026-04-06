@@ -1,128 +1,107 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Search, Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function Stock() {
   const navigate = useNavigate();
-  const [stock, setStock] = useState([]);
-  const [filter, setFilter] = useState('all');
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadStock();
+    loadProducts();
   }, []);
 
-  const loadStock = async () => {
+  const loadProducts = async () => {
+    setLoading(true);
     try {
       const data = await base44.entities.Stock.list();
-      setStock(data);
-    } catch (error) {
-      console.error('Failed to load stock:', error);
+      setProducts(data);
+    } catch (err) {
+      console.error('Stock fetch error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = stock.filter(item => {
-    const matchesFilter = filter === 'all' || item.status === filter;
-    const matchesSearch =
-      item.product_name.toLowerCase().includes(search.toLowerCase()) ||
-      item.product_sku.toLowerCase().includes(search.toLowerCase());
-    return matchesFilter && matchesSearch;
+  const filtered = products.filter(p => {
+    const matchesSearch = p.product_name?.toLowerCase().includes(search.toLowerCase()) ||
+                         p.product_sku?.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'all' ||
+                         (filter === 'low' && p.status === 'low_stock') ||
+                         (filter === 'out' && p.status === 'out_of_stock');
+    return matchesSearch && matchesFilter;
   });
 
   const getStatusColor = (status) => {
-    const colors = {
-      in_stock: 'bg-green-100 text-green-800',
-      low_stock: 'bg-yellow-100 text-yellow-800',
-      out_of_stock: 'bg-red-100 text-red-800',
-      expired: 'bg-gray-100 text-gray-800',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    switch (status) {
+      case 'in_stock': return 'bg-green-50 border-green-200';
+      case 'low_stock': return 'bg-amber-50 border-amber-200';
+      case 'out_of_stock': return 'bg-red-50 border-red-200';
+      default: return 'bg-gray-50 border-gray-200';
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Offline Sync Banner */}
+    <div className="min-h-screen bg-background pb-24">
       <OfflineSyncBanner />
 
       {/* Header */}
-      <div className="bg-primary text-white p-4 sticky top-0 z-40">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate(-1)} className="text-xl">←</button>
-          <h1 className="text-xl font-bold">Stock Levels</h1>
-        </div>
+      <div className="bg-primary text-white p-4">
+        <h1 className="text-2xl font-bold">📦 Stock</h1>
+        <p className="text-sm text-primary-light">Manage inventory</p>
+      </div>
 
-        {/* Search */}
-        <input
-          type="text"
-          placeholder="Search product..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg text-foreground placeholder-foreground/50"
-        />
+      {/* Search */}
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center gap-2 bg-white border border-border rounded-lg px-3 py-2">
+          <Search className="w-5 h-5 text-foreground/40" />
+          <input
+            type="text"
+            placeholder="Search product..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 outline-none bg-transparent"
+          />
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 p-4 overflow-x-auto">
-        {['all', 'in_stock', 'low_stock', 'out_of_stock', 'expired'].map(status => (
+      <div className="p-4 flex gap-2 border-b border-border overflow-x-auto">
+        {['all', 'low', 'out'].map(f => (
           <button
-            key={status}
-            onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition ${
-              filter === status
-                ? 'bg-primary text-white'
-                : 'bg-muted text-foreground hover:bg-border'
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-4 py-2 rounded-full font-medium whitespace-nowrap ${
+              filter === f ? 'bg-primary text-white' : 'bg-muted text-foreground'
             }`}
           >
-            {status === 'all' ? 'All' : status.replace('_', ' ').toUpperCase()}
+            {f === 'all' && 'All'}
+            {f === 'low' && '⚠️ Low'}
+            {f === 'out' && '❌ Out'}
           </button>
         ))}
       </div>
 
-      {/* List */}
+      {/* Products List */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center p-8">
-          <p className="text-2xl mb-2">📦</p>
-          <p className="text-foreground/60">No products found</p>
-        </div>
+        <div className="p-4 text-center text-foreground/60">Loading...</div>
       ) : (
-        <div className="space-y-2 p-4">
-          {filtered.map(item => (
+        <div className="p-4 space-y-3">
+          {filtered.map(product => (
             <div
-              key={item.id}
-              onClick={() => navigate(`/stock/${item.id}`)}
-              className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition cursor-pointer"
+              key={product.id}
+              onClick={() => navigate(`/product/${product.id}`)}
+              className={`p-4 rounded-lg border cursor-pointer ${getStatusColor(product.status)}`}
             >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <p className="font-semibold text-foreground">{item.product_name}</p>
-                  <p className="text-xs text-foreground/60">{item.product_sku}</p>
-                </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusColor(item.status)}`}>
-                  {item.status.replace('_', ' ')}
-                </span>
-              </div>
-
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-primary">{item.quantity}</p>
-                  <p className="text-xs text-foreground/60">units</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-foreground/60">Location: {item.location}</p>
-                  {item.last_counted && (
-                    <p className="text-xs text-foreground/60">
-                      Last: {new Date(item.last_counted).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
+              <p className="font-semibold text-foreground">{product.product_name}</p>
+              <p className="text-xs text-foreground/60">{product.product_sku}</p>
+              <div className="flex justify-between items-end mt-2">
+                <p className="font-bold text-lg text-foreground">{product.quantity}</p>
+                <span className="text-xs font-medium text-foreground/60">{product.location}</span>
               </div>
             </div>
           ))}
@@ -131,10 +110,10 @@ export default function Stock() {
 
       {/* FAB */}
       <button
-        onClick={() => navigate('/stock/new')}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-primary-light transition"
+        onClick={() => navigate('/scan')}
+        className="fixed bottom-24 right-4 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg text-2xl hover:bg-primary-light"
       >
-        +
+        📷
       </button>
     </div>
   );

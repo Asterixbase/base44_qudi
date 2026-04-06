@@ -1,9 +1,5 @@
 /* eslint-env jest */
 
-/* eslint-env jest */
-
-/* eslint-env jest */
-
 import { convertCurrency, calculateComplianceFee, buildPayoutSummary, EXCHANGE_RATES, COMPLIANCE_FEES } from '../lib/currencyConverter';
 
 describe('Currency Converter', () => {
