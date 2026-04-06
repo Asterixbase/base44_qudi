@@ -149,7 +149,7 @@ export default function CircleDetail() {
             <div style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>Members</div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <CircleSummaryPDF circle={circle} members={enrichedMembers} />
-              <Link to="/referrals" state={{ circle }} style={{ background: 'none', border: 'none', color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}>+ Invite member</Link>
+              <Link to="/invitations" state={{ circle }} style={{ background: 'none', border: 'none', color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}>+ Invite member</Link>
             </div>
           </div>
           {enrichedMembers.map(m => {

@@ -1,0 +1,85 @@
+{
+  "name": "Invitation",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "circle_name": {
+      "type": "string",
+      "title": "Circle Name"
+    },
+    "organiser_id": {
+      "type": "string",
+      "title": "Organiser ID"
+    },
+    "organiser_name": {
+      "type": "string",
+      "title": "Organiser Name"
+    },
+    "invitee_name": {
+      "type": "string",
+      "title": "Invitee Name"
+    },
+    "invitee_phone": {
+      "type": "string",
+      "title": "Invitee Phone"
+    },
+    "invitee_email": {
+      "type": "string",
+      "title": "Invitee Email"
+    },
+    "invite_code": {
+      "type": "string",
+      "title": "Unique Invite Code"
+    },
+    "deep_link": {
+      "type": "string",
+      "title": "Deep Link URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "viewed",
+        "joined",
+        "expired"
+      ],
+      "title": "Status"
+    },
+    "guarantor_name": {
+      "type": "string",
+      "title": "Guarantor Name"
+    },
+    "guarantor_phone": {
+      "type": "string",
+      "title": "Guarantor Phone"
+    },
+    "guarantor_linked": {
+      "type": "boolean",
+      "title": "Guarantor Linked"
+    },
+    "sms_sent": {
+      "type": "boolean",
+      "title": "SMS Sent"
+    },
+    "sms_log": {
+      "type": "string",
+      "title": "SMS Log / Simulated Message"
+    },
+    "expires_at": {
+      "type": "string",
+      "title": "Expires At (ISO date)"
+    },
+    "note": {
+      "type": "string",
+      "title": "Organiser Note"
+    }
+  },
+  "required": [
+    "circle_id",
+    "circle_name",
+    "status"
+  ]
+}
