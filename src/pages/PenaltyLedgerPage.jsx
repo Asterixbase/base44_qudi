@@ -114,6 +114,10 @@ export default function PenaltyLedgerPage() {
             {scanResult === 0 ? '✅ No new penalties triggered' : `⚠️ ${scanResult} new penalty${scanResult !== 1 ? 'ies' : 'y'} triggered`}
           </div>
         )}
+        <button onClick={() => navigate('/auto-penalties')} style={{
+          width: '100%', marginTop: 8, background: 'none', border: `1px solid ${C.border}`,
+          color: C.goldText, borderRadius: 10, padding: '9px', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+        }}>⚙️ Advanced Scanner & Date Controls →</button>
       </div>
 
       {/* Filter tabs */}

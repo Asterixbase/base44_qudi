@@ -6,6 +6,36 @@
  */
 import { base44 } from '@/api/base44Client';
 
+// ── deadline helpers ────────────────────────────────────────────────────────
+
+/**
+ * Returns the contribution due date for the current cycle.
+ * @param {object} circle  - Circle record (frequency, current_cycle)
+ * @param {string} startDate - ISO date string of cycle 1 start
+ */
+export function calcDueDate(circle, startDate) {
+  const base = startDate ? new Date(startDate) : new Date();
+  const freqDays = circle.frequency === 'weekly' ? 7 : 30;
+  const cycle = (circle.current_cycle || 1) - 1; // 0-indexed offset
+  const due = new Date(base);
+  due.setDate(due.getDate() + freqDays * cycle);
+  return due;
+}
+
+/**
+ * Returns how many days past due TODAY is (0 if not yet due).
+ * @param {object} circle
+ * @param {string} startDate - ISO date string
+ */
+export function calcDaysLate(circle, startDate) {
+  const due = calcDueDate(circle, startDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  due.setHours(0, 0, 0, 0);
+  const diff = Math.floor((today - due) / (1000 * 60 * 60 * 24));
+  return Math.max(0, diff);
+}
+
 // ── calculation ────────────────────────────────────────────────────────────
 
 export function calcPenaltyAmount(circle, contributionAmount, daysLate) {
