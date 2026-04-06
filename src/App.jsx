@@ -21,6 +21,8 @@ import PurchaseOrders from './pages/PurchaseOrders';
 import StockForecasting from './pages/StockForecasting';
 import AdminDashboard from './pages/AdminDashboard';
 import InventoryMetricsDashboard from './pages/InventoryMetricsDashboard';
+import SikasemDashboard from './pages/SikasemDashboard';
+import Sale from './pages/Sale';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -60,6 +62,8 @@ const AuthenticatedApp = () => {
       <Route path="/forecasting" element={<StockForecasting />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/inventory-metrics" element={<InventoryMetricsDashboard />} />
+      <Route path="/sikasem-dashboard" element={<SikasemDashboard />} />
+      <Route path="/sale" element={<Sale />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
