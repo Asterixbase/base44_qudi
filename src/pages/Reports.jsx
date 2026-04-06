@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
+import RevenueChart from '@/components/RevenueChart';
+import TopProductsWeeklyChart from '@/components/TopProductsWeeklyChart';
+import CategoryMarginChart from '@/components/CategoryMarginChart';
 
 export default function Reports() {
   const navigate = useNavigate();
@@ -11,6 +14,9 @@ export default function Reports() {
     avgStockPerProduct: 0,
     topProducts: [],
   });
+  const [revenueData, setRevenueData] = useState([]);
+  const [weeklyTopProducts, setWeeklyTopProducts] = useState([]);
+  const [categoryMargins, setCategoryMargins] = useState([]);
   const [period, setPeriod] = useState('month');
 
   useEffect(() => {
@@ -22,6 +28,18 @@ export default function Reports() {
       const products = await base44.entities.Product.list();
       const stock = await base44.entities.Stock.list();
       const transactions = await base44.entities.Transaction.list();
+
+      // Calculate revenue trends (daily for last 7 days)
+      const revenueTrends = calculateRevenuetrends(transactions);
+      setRevenueData(revenueTrends);
+
+      // Get top selling products this week
+      const topWeekly = calculateTopProductsWeekly(transactions, products);
+      setWeeklyTopProducts(topWeekly);
+
+      // Calculate average margin by category
+      const margins = calculateCategoryMargins(products);
+      setCategoryMargins(margins);
 
       const totalValue = products.reduce((sum, p) => {
         const s = stock.find(st => st.product_id === p.id);
@@ -99,9 +117,16 @@ export default function Reports() {
         />
       </div>
 
-      {/* Top Products */}
+      {/* Charts */}
+      <div className="p-4 space-y-6">
+        <RevenueChart data={revenueData} />
+        <TopProductsWeeklyChart data={weeklyTopProducts} />
+        <CategoryMarginChart data={categoryMargins} />
+      </div>
+
+      {/* Top Products by Quantity */}
       <div className="p-4">
-        <h2 className="text-lg font-bold mb-4">Top 5 Products by Quantity</h2>
+        <h2 className="text-lg font-bold mb-4">Top 5 Products by Inventory</h2>
         <div className="space-y-2">
           {stats.topProducts.length === 0 ? (
             <p className="text-foreground/60 text-center py-8">No data available</p>
@@ -152,4 +177,73 @@ function KPICard({ label, value, icon }) {
       <p className="text-2xl font-bold text-foreground break-words">{value}</p>
     </div>
   );
+}
+
+function calculateRevenuetrends(transactions) {
+  const data = {};
+  const now = new Date();
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    data[dateStr] = 0;
+  }
+
+  transactions.forEach((tx) => {
+    if (tx.type === 'out') {
+      const txDate = new Date(tx.created_date);
+      const dateStr = txDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (data.hasOwnProperty(dateStr)) {
+        // Estimate revenue based on default pricing (in production, would use actual unit prices)
+        data[dateStr] += tx.quantity * 50; // 50 as default unit price estimate
+      }
+    }
+  });
+
+  return Object.entries(data).map(([date, revenue]) => ({ date, revenue }));
+}
+
+function calculateTopProductsWeekly(transactions, products) {
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const productSales = {};
+  transactions.forEach((tx) => {
+    if (tx.type === 'out' && new Date(tx.created_date) >= weekAgo) {
+      productSales[tx.product_id] = (productSales[tx.product_id] || 0) + tx.quantity;
+    }
+  });
+
+  return Object.entries(productSales)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([productId, quantity]) => {
+      const product = products.find((p) => p.id === productId);
+      return {
+        name: product?.name || 'Unknown',
+        quantity,
+      };
+    });
+}
+
+function calculateCategoryMargins(products) {
+  const categoryMargins = {};
+
+  products.forEach((p) => {
+    if (p.category) {
+      if (!categoryMargins[p.category]) {
+        categoryMargins[p.category] = { total: 0, count: 0 };
+      }
+      // Estimate margin: assume 30% default margin, could be enhanced with cost data
+      const margin = 30;
+      categoryMargins[p.category].total += margin;
+      categoryMargins[p.category].count += 1;
+    }
+  });
+
+  return Object.entries(categoryMargins).map(([category, data]) => ({
+    category,
+    margin: Math.round((data.total / data.count) * 10) / 10,
+  }));
 }

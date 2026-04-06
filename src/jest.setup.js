@@ -1,4 +1,6 @@
 // Jest setup file
+/* global describe, test, expect, beforeEach */
+
 // Mock Base44 SDK for tests
 jest.mock('@/api/base44Client', () => ({
   base44: {
