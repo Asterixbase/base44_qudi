@@ -191,6 +191,12 @@ export default function CircleDetail() {
                     style={{ background: 'none', border: 'none', fontSize: 10, color: C.red, fontWeight: 600, cursor: 'pointer', padding: 0, marginTop: 2 }}
                   >🚩 Flag</button>
                   <Link
+                    to="/member-profile"
+                    state={{ member: m, circle }}
+                    onClick={e => e.stopPropagation()}
+                    style={{ fontSize: 10, color: C.blue || C.goldText, fontWeight: 600, textDecoration: 'none' }}
+                  >👤 Profile</Link>
+                  <Link
                     to="/member-history"
                     state={{ member: m, circle }}
                     onClick={e => e.stopPropagation()}
