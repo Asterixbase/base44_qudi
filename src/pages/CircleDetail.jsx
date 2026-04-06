@@ -117,7 +117,7 @@ export default function CircleDetail() {
             flex: 1, background: C.gold, color: C.ink, border: 'none', borderRadius: 10,
             padding: '12px', textAlign: 'center', fontWeight: 700, fontSize: 13, textDecoration: 'none',
           }}>Collect dues</Link>
-          <Link to="/send-payout" style={{
+          <Link to="/payout-scheduler" state={{ circle }} style={{
             flex: 1, background: C.ink, color: C.cream, border: 'none', borderRadius: 10,
             padding: '12px', textAlign: 'center', fontWeight: 700, fontSize: 13, textDecoration: 'none',
           }}>Pay out</Link>
