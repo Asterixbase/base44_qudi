@@ -3,9 +3,9 @@ import { base44 } from '@/api/base44Client';
 import { C } from '../../lib/qudiTokens';
 
 const DISPUTE_TYPES = [
-  { value: 'payment_status',        label: '💳 Incorrect payment status',   desc: 'My status is marked wrong' },
-  { value: 'suspicious_transaction',label: '🚨 Suspicious transaction',     desc: 'I see an unauthorised or incorrect debit' },
-  { value: 'missed_payout',         label: '📭 Missed payout',              desc: "I was due a payout but didn't receive it" },              desc: 'I was due a payout but didn't receive it' },
+  { value: 'payment_status',         label: '💳 Incorrect payment status',  desc: 'My status is marked wrong' },
+  { value: 'suspicious_transaction', label: '🚨 Suspicious transaction',    desc: 'I see an unauthorised or incorrect debit' },
+  { value: 'missed_payout',          label: '📭 Missed payout',             desc: "I was due a payout but didn't receive it" },
 ];
 
 const STATUS_OPTIONS = [
