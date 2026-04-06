@@ -21,6 +21,7 @@ import MyPayouts from './pages/MyPayouts';
 import PenaltyLedgerPage from './pages/PenaltyLedgerPage';
 import AdminDashboard from './pages/AdminDashboard';
 import InviteSystem from './pages/InviteSystem';
+import PayoutDistribution from './pages/PayoutDistribution';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
       <Route path="/penalty-ledger" element={<PenaltyLedgerPage />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/invitations" element={<InviteSystem />} />
+      <Route path="/payout-distribution" element={<PayoutDistribution />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

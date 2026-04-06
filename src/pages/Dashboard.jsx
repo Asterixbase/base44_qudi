@@ -84,8 +84,8 @@ export default function Dashboard() {
         <div style={{ display: 'flex', gap: 0, padding: '12px 16px', borderBottom: `1px solid ${C.border}` }}>
           {[
             { label: 'Collect', path: '/collect-dues' },
-            { label: 'My Payouts', path: '/my-payouts' },
-            { label: 'Referrals', path: '/referrals' },
+            { label: 'Payouts', path: '/payout-distribution' },
+            { label: 'Invites', path: '/invitations' },
             { label: 'Disputes', path: '/disputes' },
           ].map(({ label, path }) => (
             <Link key={label} to={path} style={{
