@@ -28,6 +28,7 @@ import ReconciliationPage from './pages/ReconciliationPage';
 import PayoutRoadmap from './pages/PayoutRoadmap';
 import MemberContributionHistory from './pages/MemberContributionHistory';
 import CashFlowForecast from './pages/CashFlowForecast';
+import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -77,6 +78,7 @@ const AuthenticatedApp = () => {
       <Route path="/payout-roadmap" element={<PayoutRoadmap />} />
       <Route path="/member-history" element={<MemberContributionHistory />} />
       <Route path="/cash-flow-forecast" element={<CashFlowForecast />} />
+      <Route path="/smart-payout" element={<SmartPayoutScheduler />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
