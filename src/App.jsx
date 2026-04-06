@@ -56,25 +56,16 @@ const AuthenticatedApp = () => {
       <Route path="/credit" element={<><CreditTab /><BottomNav /></>} />
       <Route path="/tax" element={<><TaxTab /><BottomNav /></>} />
       <Route path="/more" element={<><MoreTab /><BottomNav /></>} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/metrics" element={<MetricsDashboard />} />
-      <Route path="/alerts" element={<StockAlerts />} />
       <Route path="/notifications" element={<StockNotifications />} />
       <Route path="/predictions" element={<StockPredictions />} />
       <Route path="/activity" element={<ActivityFeed />} />
       <Route path="/scan" element={<Scanner />} />
-      <Route path="/stock" element={<Stock />} />
+      <Route path="/stock-detail" element={<Stock />} />
       <Route path="/scan-inventory" element={<BarcodeInventoryScanner />} />
       <Route path="/reports" element={<Reports />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/purchase-orders" element={<PurchaseOrders />} />
       <Route path="/forecasting" element={<StockForecasting />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/inventory-metrics" element={<InventoryMetricsDashboard />} />
-      <Route path="/sikasem-dashboard" element={<SikasemDashboard />} />
-      <Route path="/sale" element={<Sale />} />
-      <Route path="/credit-secure" element={<CreditSecure />} />
-      <Route path="/compliance" element={<ComplianceDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
