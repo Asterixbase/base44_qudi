@@ -69,6 +69,80 @@ export default function AdminDashboard() {
   };
 
   const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [transactions, products, stock] = await Promise.all([
+        base44.entities.Transaction.list('-created_date', 500),
+        base44.entities.Product.list(),
+        base44.entities.Stock.list(),
+      ]);
+
+      // Process daily revenue data (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const revenueMap = {};
+      transactions
+        .filter(tx => {
+          const txDate = new Date(tx.created_date);
+          return tx.type === 'out' && txDate >= thirtyDaysAgo;
+        })
+        .forEach(tx => {
+          const date = new Date(tx.created_date).toLocaleDateString('en-GB');
+          const product = products.find(p => p.id === tx.product_id);
+          const amount = (product?.unit_price || 0) * tx.quantity;
+          revenueMap[date] = (revenueMap[date] || 0) + amount;
+        });
+
+      const revenueChartData = Object.entries(revenueMap)
+        .map(([date, revenue]) => ({ date, revenue }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setRevenueData(revenueChartData);
+
+      // Process top products
+      const productSalesMap = {};
+      transactions
+        .filter(tx => {
+          const txDate = new Date(tx.created_date);
+          return tx.type === 'out' && txDate >= thirtyDaysAgo;
+        })
+        .forEach(tx => {
+          productSalesMap[tx.product_id] = (productSalesMap[tx.product_id] || 0) + tx.quantity;
+        });
+
+      const topProductsList = Object.entries(productSalesMap)
+        .map(([productId, quantity]) => {
+          const product = products.find(p => p.id === productId);
+          return {
+            id: productId,
+            name: product?.name || 'Unknown',
+            quantity,
+          };
+        })
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 10);
+
+      setTopProducts(topProductsList);
+
+      // Calculate stock turnover metrics
+      const totalUnitsSold = Object.values(productSalesMap).reduce((sum, qty) => sum + qty, 0);
+      const avgStockLevel = stock.length > 0 
+        ? stock.reduce((sum, s) => sum + s.quantity, 0) / stock.length 
+        : 0;
+      const turnoverRatio = avgStockLevel > 0 ? totalUnitsSold / avgStockLevel : 0;
+
+      setStockMetrics({
+        totalUnitsSold,
+        avgStockLevel,
+        turnoverRatio,
+      });
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
