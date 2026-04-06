@@ -1,0 +1,65 @@
+{
+  "name": "Dispute",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "reported_status": {
+      "type": "string",
+      "title": "Incorrectly Reported Status"
+    },
+    "claimed_status": {
+      "type": "string",
+      "enum": [
+        "paid",
+        "pending",
+        "failed",
+        "overdue"
+      ],
+      "title": "Member's Claimed Status"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "proof_url": {
+      "type": "string",
+      "title": "Proof of Payment URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "under_review",
+        "resolved",
+        "rejected"
+      ],
+      "title": "Dispute Status"
+    },
+    "organiser_note": {
+      "type": "string",
+      "title": "Organiser Note"
+    },
+    "cycle": {
+      "type": "number",
+      "title": "Cycle Number"
+    }
+  },
+  "required": [
+    "circle_id",
+    "member_name",
+    "reported_status",
+    "claimed_status",
+    "status"
+  ]
+}

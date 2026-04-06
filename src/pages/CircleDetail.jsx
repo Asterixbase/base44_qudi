@@ -13,6 +13,7 @@ import PayoutSchedule from '../components/qudi/PayoutSchedule';
 import NavBar from '../components/qudi/NavBar';
 import { enrichMembersWithTrust } from '../lib/trustScore';
 import CircleSummaryPDF from '../components/qudi/CircleSummaryPDF';
+import DisputeModal from '../components/qudi/DisputeModal';
 
 const DEMO_MEMBERS = [
   { id: 'm1', initials: 'AA', full_name: 'Akosua Asante', payout_position: 1, payment_status: 'paid',    trust_score: 92, is_verified: true },
@@ -40,6 +41,7 @@ export default function CircleDetail() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberStatuses, setMemberStatuses] = useState({});
   const [memberTrustOverrides, setMemberTrustOverrides] = useState({});
+  const [disputeMember, setDisputeMember] = useState(null);
 
   const getMemberStatus = (m) => memberStatuses[m.id] || m.payment_status;
 
@@ -172,12 +174,25 @@ export default function CircleDetail() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                   <span style={{ background: s.bg, color: s.color, borderRadius: 6, padding: '3px 8px', fontSize: 11, fontWeight: 600 }}>{s.label}</span>
                   {canMark && <span style={{ fontSize: 10, color: C.goldText, fontWeight: 600 }}>Tap to mark paid</span>}
+                  <button
+                    onClick={e => { e.stopPropagation(); setDisputeMember(m); }}
+                    style={{ background: 'none', border: 'none', fontSize: 10, color: C.red, fontWeight: 600, cursor: 'pointer', padding: 0, marginTop: 2 }}
+                  >🚩 Flag</button>
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      {disputeMember && (
+        <DisputeModal
+          member={disputeMember}
+          circle={circle}
+          onClose={() => setDisputeMember(null)}
+          onSubmitted={() => setDisputeMember(null)}
+        />
+      )}
 
       {selectedMember && (
         <MarkPaidModal
@@ -186,7 +201,6 @@ export default function CircleDetail() {
           onClose={() => setSelectedMember(null)}
           onSuccess={(id) => {
             setMemberStatuses(s => ({ ...s, [id]: 'paid' }));
-            // Recalculate trust for newly-paid member
             const base = DEMO_MEMBERS.find(m => m.id === id)?.trust_score ?? 50;
             setMemberTrustOverrides(t => ({ ...t, [id]: Math.min(100, base + 8) }));
           }}
