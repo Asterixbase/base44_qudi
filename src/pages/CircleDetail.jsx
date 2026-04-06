@@ -12,6 +12,7 @@ import MarkPaidModal from '../components/qudi/MarkPaidModal';
 import PayoutSchedule from '../components/qudi/PayoutSchedule';
 import NavBar from '../components/qudi/NavBar';
 import { enrichMembersWithTrust } from '../lib/trustScore';
+import CircleSummaryPDF from '../components/qudi/CircleSummaryPDF';
 
 const DEMO_MEMBERS = [
   { id: 'm1', initials: 'AA', full_name: 'Akosua Asante', payout_position: 1, payment_status: 'paid',    trust_score: 92, is_verified: true },
@@ -136,7 +137,10 @@ export default function CircleDetail() {
         <div style={{ padding: '0 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <div style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>Members</div>
-            <button style={{ background: 'none', border: 'none', color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add member</button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <CircleSummaryPDF circle={circle} members={enrichedMembers} />
+              <button style={{ background: 'none', border: 'none', color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add member</button>
+            </div>
           </div>
           {enrichedMembers.map(m => {
             const status = m.payment_status;
