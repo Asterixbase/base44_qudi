@@ -5,7 +5,8 @@ import { C } from '../lib/qudiTokens';
 import Header from '../components/qudi/Header';
 import KenteStripe from '../components/qudi/KenteStripe';
 import NavBar from '../components/qudi/NavBar';
-import { computePenalty } from '../lib/penaltyEngine';
+import { Link } from 'react-router-dom';
+import { calcPenaltyAmount } from '../lib/penaltyEngine';
 
 const PENALTY_TYPES = [
   { value: 'flat_fee',       label: 'Flat Fee',       desc: 'Fixed GHS amount per offence' },
@@ -50,7 +51,7 @@ export default function PenaltySettings() {
     }
   }, [selected?.id]);
 
-  const preview = selected ? computePenalty({ ...selected, ...form }, 3) : 0;
+  const preview = selected ? calcPenaltyAmount({ ...selected, ...form }, selected.contribution_amount || 200, 3) : 0;
 
   const save = async () => {
     if (!selected) return;
@@ -188,6 +189,15 @@ export default function PenaltySettings() {
                 </div>
               </>
             )}
+
+            <button
+              onClick={() => navigate('/penalty-ledger')}
+              style={{
+                width: '100%', padding: '12px', background: C.tealBg, color: C.tealTx,
+                border: `1px solid ${C.teal}`, borderRadius: 12,
+                fontSize: 14, fontWeight: 700, cursor: 'pointer', marginBottom: 10,
+              }}
+            >📋 View Penalty Ledger & Auto-Scan</button>
 
             <button
               onClick={save}

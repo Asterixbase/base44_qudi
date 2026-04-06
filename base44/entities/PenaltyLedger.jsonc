@@ -1,0 +1,83 @@
+{
+  "name": "PenaltyLedger",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "circle_name": {
+      "type": "string",
+      "title": "Circle Name"
+    },
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "cycle": {
+      "type": "number",
+      "title": "Cycle Number"
+    },
+    "penalty_type": {
+      "type": "string",
+      "enum": [
+        "flat_fee",
+        "percentage",
+        "daily_interest"
+      ],
+      "title": "Penalty Type"
+    },
+    "contribution_amount": {
+      "type": "number",
+      "title": "Contribution Amount (GHS)"
+    },
+    "penalty_amount": {
+      "type": "number",
+      "title": "Penalty Amount (GHS)"
+    },
+    "days_late": {
+      "type": "number",
+      "title": "Days Late"
+    },
+    "settlement_method": {
+      "type": "string",
+      "enum": [
+        "payout_deduction",
+        "manual_payment",
+        "waived"
+      ],
+      "title": "Settlement Method"
+    },
+    "settlement_status": {
+      "type": "string",
+      "enum": [
+        "outstanding",
+        "settled",
+        "waived"
+      ],
+      "title": "Settlement Status"
+    },
+    "deducted_from_cycle": {
+      "type": "number",
+      "title": "Deducted From Payout Cycle"
+    },
+    "auto_triggered": {
+      "type": "boolean",
+      "title": "Auto-triggered by system"
+    },
+    "note": {
+      "type": "string",
+      "title": "Note"
+    }
+  },
+  "required": [
+    "circle_id",
+    "member_name",
+    "penalty_amount",
+    "settlement_status"
+  ]
+}

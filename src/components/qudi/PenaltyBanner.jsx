@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { C } from '../../lib/qudiTokens';
-import { applyPenalty, computePenalty } from '../../lib/penaltyEngine';
+import { triggerPenalty, calcPenaltyAmount } from '../../lib/penaltyEngine';
 
 export default function PenaltyBanner({ circle, member, daysLate = 1 }) {
   const [status, setStatus] = useState('idle'); // idle | applying | done | skipped
@@ -13,12 +13,13 @@ export default function PenaltyBanner({ circle, member, daysLate = 1 }) {
   if (!circle?.penalty_enabled) return null;
   if (!['failed', 'overdue'].includes(member?.payment_status)) return null;
 
-  const previewAmount = computePenalty(circle, daysLate);
+  const previewAmount = calcPenaltyAmount(circle, circle.contribution_amount || 0, daysLate);
   if (previewAmount <= 0) return null;
 
   const trigger = async () => {
     setStatus('applying');
-    const record = await applyPenalty({ circle, member, daysLate });
+    const result = await triggerPenalty({ circle, member, daysLate });
+    const record = result?.penalty;
     setPenaltyRecord(record);
     setStatus(record ? 'done' : 'skipped');
   };

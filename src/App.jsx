@@ -18,6 +18,7 @@ import PenaltySettings from './pages/PenaltySettings';
 import PayoutScheduler from './pages/PayoutScheduler';
 import ReferralHub from './pages/ReferralHub';
 import MyPayouts from './pages/MyPayouts';
+import PenaltyLedgerPage from './pages/PenaltyLedgerPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
       <Route path="/payout-scheduler" element={<PayoutScheduler />} />
       <Route path="/referrals" element={<ReferralHub />} />
       <Route path="/my-payouts" element={<MyPayouts />} />
+      <Route path="/penalty-ledger" element={<PenaltyLedgerPage />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
