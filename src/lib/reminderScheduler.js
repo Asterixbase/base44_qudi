@@ -33,6 +33,7 @@ export function daysUntil(date) {
  */
 export function getReminderTier(daysLeft) {
   if (daysLeft === 3) return { tier: '3-day',  emoji: '📅', urgency: 'upcoming' };
+  if (daysLeft === 2) return { tier: '2-day',  emoji: '⏳', urgency: 'approaching' };
   if (daysLeft === 1) return { tier: '1-day',  emoji: '⏰', urgency: 'soon' };
   if (daysLeft === 0) return { tier: 'due-today', emoji: '🔔', urgency: 'critical' };
   return null;
@@ -46,6 +47,7 @@ export function buildReminderMessage(member, circle, tier) {
   const name = circle.name || 'your circle';
   const msgs = {
     '3-day':     `Hi ${member.full_name}, your GHS ${amount} contribution to "${name}" is due in 3 days. Pay via MoMo to stay on track! — Qudi`,
+    '2-day':     `⏳ Heads up, ${member.full_name}! Your GHS ${amount} contribution to "${name}" is due in 2 days. Don't forget to pay via MoMo. — Qudi`,
     '1-day':     `⚠️ Reminder: Your GHS ${amount} contribution to "${name}" is due TOMORROW. Please pay via MoMo before the deadline. — Qudi`,
     'due-today': `🔔 TODAY is payment day! Your GHS ${amount} contribution to "${name}" must be paid now via MoMo to avoid penalties. — Qudi`,
   };
