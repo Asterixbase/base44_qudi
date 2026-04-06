@@ -66,6 +66,43 @@ export async function executePayout({ circle, member, amount, note = '' }) {
 }
 
 /**
+ * Calculate payout breakdown for the current cycle winner.
+ * Returns { winner, grossPot, totalCollected, collectionRate, penaltyDeduction, netPayout, contributions }
+ */
+export async function calculateCyclePayout({ circle, members, penaltyLedger = [] }) {
+  const currentCycle = circle.current_cycle || 1;
+
+  // Fetch all successful collection transactions for this cycle
+  const contributions = await base44.entities.Transaction.filter({
+    circle_id: circle.id,
+    type: 'collection',
+    status: 'success',
+    cycle: currentCycle,
+  });
+
+  const totalCollected = contributions.reduce((s, t) => s + (t.amount || 0), 0);
+  const grossPot = (circle.contribution_amount || 0) * (circle.max_members || 1);
+  const collectionRate = grossPot > 0 ? Math.round((totalCollected / grossPot) * 100) : 0;
+
+  // Determine current cycle winner by payout position
+  const sorted = [...members].sort((a, b) => (a.payout_position || 0) - (b.payout_position || 0));
+  const winner = sorted.find(m => !m.has_received_payout) || null;
+
+  // Outstanding penalties for winner
+  let penaltyDeduction = 0;
+  if (winner) {
+    const outstanding = penaltyLedger.filter(
+      p => p.member_id === (winner.id || winner.user_id) && p.settlement_status === 'outstanding'
+    );
+    penaltyDeduction = outstanding.reduce((s, p) => s + (p.penalty_amount || 0), 0);
+  }
+
+  const netPayout = Math.max(0, totalCollected - penaltyDeduction);
+
+  return { winner, grossPot, totalCollected, collectionRate, penaltyDeduction, netPayout, contributions };
+}
+
+/**
  * Run the full distribution for all due members in a circle.
  * Returns array of results.
  */
