@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
+import ReorderSettings from '@/components/ReorderSettings';
 
 export default function Settings() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showReorderSettings, setShowReorderSettings] = useState(false);
 
   const handleLogout = async () => {
     await base44.auth.logout('/');
@@ -44,6 +46,24 @@ export default function Settings() {
           <SettingItem label="Storage Used" value="2.4 MB" />
           <SettingItem label="Language" value="English" onClick={() => {}} />
           <SettingItem label="About" value="" onClick={() => navigate('/about')} />
+        </div>
+      </div>
+
+      {/* Inventory Management */}
+      <div className="p-4">
+        <h2 className="text-sm font-semibold uppercase text-foreground/60 tracking-wider mb-4">Inventory</h2>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <button
+            onClick={() => setShowReorderSettings(!showReorderSettings)}
+            className="w-full text-left py-2 font-medium text-foreground hover:text-primary transition"
+          >
+            {showReorderSettings ? '▼' : '▶'} Reorder Level Settings
+          </button>
+          {showReorderSettings && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <ReorderSettings />
+            </div>
+          )}
         </div>
       </div>
 
