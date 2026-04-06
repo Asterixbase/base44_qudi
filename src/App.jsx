@@ -12,6 +12,7 @@ import CircleDetail from './pages/CircleDetail';
 import CollectDues from './pages/CollectDues';
 import SendPayout from './pages/SendPayout';
 // Add page imports here
+import DisputeDashboard from './pages/DisputeDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -45,6 +46,7 @@ const AuthenticatedApp = () => {
       <Route path="/circle-detail" element={<CircleDetail />} />
       <Route path="/collect-dues" element={<CollectDues />} />
       <Route path="/send-payout" element={<SendPayout />} />
+      <Route path="/disputes" element={<DisputeDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
