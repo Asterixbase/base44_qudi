@@ -8,6 +8,7 @@ import TrustBadge from '../components/qudi/TrustBadge';
 import FraudAlert from '../components/qudi/FraudAlert';
 import CircleAnalytics from '../components/qudi/CircleAnalytics';
 import ReminderButton from '../components/qudi/ReminderButton';
+import PayoutSchedule from '../components/qudi/PayoutSchedule';
 import NavBar from '../components/qudi/NavBar';
 
 const DEMO_MEMBERS = [
@@ -108,6 +109,9 @@ export default function CircleDetail() {
 
         {/* Reminders */}
         <ReminderButton members={DEMO_MEMBERS} circle={circle} />
+
+        {/* Payout Schedule */}
+        <PayoutSchedule members={DEMO_MEMBERS} circle={circle} />
 
         {/* Analytics */}
         <CircleAnalytics circle={circle} />
