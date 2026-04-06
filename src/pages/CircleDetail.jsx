@@ -8,6 +8,7 @@ import TrustBadge from '../components/qudi/TrustBadge';
 import FraudAlert from '../components/qudi/FraudAlert';
 import CircleAnalytics from '../components/qudi/CircleAnalytics';
 import ReminderButton from '../components/qudi/ReminderButton';
+import MarkPaidModal from '../components/qudi/MarkPaidModal';
 import PayoutSchedule from '../components/qudi/PayoutSchedule';
 import NavBar from '../components/qudi/NavBar';
 
@@ -34,6 +35,10 @@ export default function CircleDetail() {
     contribution_amount: 200, pot_balance: 1400, max_members: 10, current_cycle: 3, is_insured: true,
   };
   const [showFraud, setShowFraud] = useState(true);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [memberStatuses, setMemberStatuses] = useState({});
+
+  const getMemberStatus = (m) => memberStatuses[m.id] || m.payment_status;
 
   const paid = DEMO_MEMBERS.filter(m => m.payment_status === 'paid').length;
   const potProgress = Math.round((paid / DEMO_MEMBERS.length) * 100);
@@ -123,13 +128,17 @@ export default function CircleDetail() {
             <button style={{ background: 'none', border: 'none', color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add member</button>
           </div>
           {DEMO_MEMBERS.map(m => {
-            const s = STATUS_STYLE[m.payment_status] || STATUS_STYLE.pending;
+            const status = getMemberStatus(m);
+            const s = STATUS_STYLE[status] || STATUS_STYLE.pending;
+            const canMark = status === 'pending' || status === 'overdue' || status === 'failed';
             return (
               <div key={m.id} style={{
                 background: C.white, borderRadius: 10, padding: '10px 12px',
-                marginBottom: 6, border: `0.5px solid ${m.payment_status === 'failed' ? C.red : C.border}`,
-                display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
-              }}>
+                marginBottom: 6, border: `0.5px solid ${status === 'failed' ? C.red : C.border}`,
+                display: 'flex', alignItems: 'center', gap: 10, cursor: canMark ? 'pointer' : 'default',
+              }}
+                onClick={() => canMark && setSelectedMember(m)}
+              >
                 <div style={{ color: C.hint, fontSize: 12, fontWeight: 600, width: 16, textAlign: 'center' }}>#{m.payout_position}</div>
                 <Avatar initials={m.initials} size={36} />
                 <div style={{ flex: 1 }}>
@@ -139,12 +148,24 @@ export default function CircleDetail() {
                   </div>
                   <TrustBadge score={m.trust_score} />
                 </div>
-                <span style={{ background: s.bg, color: s.color, borderRadius: 6, padding: '3px 8px', fontSize: 11, fontWeight: 600 }}>{s.label}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                  <span style={{ background: s.bg, color: s.color, borderRadius: 6, padding: '3px 8px', fontSize: 11, fontWeight: 600 }}>{s.label}</span>
+                  {canMark && <span style={{ fontSize: 10, color: C.goldText, fontWeight: 600 }}>Tap to mark paid</span>}
+                </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      {selectedMember && (
+        <MarkPaidModal
+          member={selectedMember}
+          circle={circle}
+          onClose={() => setSelectedMember(null)}
+          onSuccess={(id) => setMemberStatuses(s => ({ ...s, [id]: 'paid' }))}
+        />
+      )}
 
       <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 430 }}>
         <NavBar />
