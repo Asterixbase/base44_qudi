@@ -1,4 +1,5 @@
 /* eslint-env jest */
+/* eslint-env jest */
 import {
   validatePhoneNumber,
   validateEmail,
