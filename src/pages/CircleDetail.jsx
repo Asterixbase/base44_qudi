@@ -11,6 +11,7 @@ import ReminderButton from '../components/qudi/ReminderButton';
 import MarkPaidModal from '../components/qudi/MarkPaidModal';
 import PayoutSchedule from '../components/qudi/PayoutSchedule';
 import NavBar from '../components/qudi/NavBar';
+import { enrichMembersWithTrust } from '../lib/trustScore';
 
 const DEMO_MEMBERS = [
   { id: 'm1', initials: 'AA', full_name: 'Akosua Asante', payout_position: 1, payment_status: 'paid',    trust_score: 92, is_verified: true },
@@ -37,10 +38,20 @@ export default function CircleDetail() {
   const [showFraud, setShowFraud] = useState(true);
   const [selectedMember, setSelectedMember] = useState(null);
   const [memberStatuses, setMemberStatuses] = useState({});
+  const [memberTrustOverrides, setMemberTrustOverrides] = useState({});
 
   const getMemberStatus = (m) => memberStatuses[m.id] || m.payment_status;
 
-  const paid = DEMO_MEMBERS.filter(m => m.payment_status === 'paid').length;
+  // Enrich all members with computed trust scores based on payment status
+  const enrichedMembers = enrichMembersWithTrust(
+    DEMO_MEMBERS.map(m => ({
+      ...m,
+      payment_status: getMemberStatus(m),
+      trust_score: memberTrustOverrides[m.id] ?? m.trust_score,
+    }))
+  );
+
+  const paid = enrichedMembers.filter(m => m.payment_status === 'paid').length;
   const potProgress = Math.round((paid / DEMO_MEMBERS.length) * 100);
 
   return (
@@ -127,10 +138,12 @@ export default function CircleDetail() {
             <div style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>Members</div>
             <button style={{ background: 'none', border: 'none', color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>+ Add member</button>
           </div>
-          {DEMO_MEMBERS.map(m => {
-            const status = getMemberStatus(m);
+          {enrichedMembers.map(m => {
+            const status = m.payment_status;
             const s = STATUS_STYLE[status] || STATUS_STYLE.pending;
             const canMark = status === 'pending' || status === 'overdue' || status === 'failed';
+            const deltaColor = m.trust_delta > 0 ? C.green : m.trust_delta < 0 ? C.red : C.muted;
+            const deltaLabel = m.trust_delta > 0 ? `+${m.trust_delta}` : `${m.trust_delta}`;
             return (
               <div key={m.id} style={{
                 background: C.white, borderRadius: 10, padding: '10px 12px',
@@ -146,7 +159,11 @@ export default function CircleDetail() {
                     <span style={{ fontWeight: 600, fontSize: 14, color: C.ink }}>{m.full_name}</span>
                     {m.is_verified && <span style={{ color: C.teal, fontSize: 13 }}>✓</span>}
                   </div>
-                  <TrustBadge score={m.trust_score} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                    <TrustBadge score={m.trust_score} />
+                    <span style={{ fontSize: 10, fontWeight: 700, color: deltaColor }}>{deltaLabel} this cycle</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>{m.trust_reason}</div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                   <span style={{ background: s.bg, color: s.color, borderRadius: 6, padding: '3px 8px', fontSize: 11, fontWeight: 600 }}>{s.label}</span>
@@ -163,7 +180,12 @@ export default function CircleDetail() {
           member={selectedMember}
           circle={circle}
           onClose={() => setSelectedMember(null)}
-          onSuccess={(id) => setMemberStatuses(s => ({ ...s, [id]: 'paid' }))}
+          onSuccess={(id) => {
+            setMemberStatuses(s => ({ ...s, [id]: 'paid' }));
+            // Recalculate trust for newly-paid member
+            const base = DEMO_MEMBERS.find(m => m.id === id)?.trust_score ?? 50;
+            setMemberTrustOverrides(t => ({ ...t, [id]: Math.min(100, base + 8) }));
+          }}
         />
       )}
 
