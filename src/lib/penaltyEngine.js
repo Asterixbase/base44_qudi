@@ -122,6 +122,49 @@ export async function triggerPenalty({ circle, member, daysLate }) {
   return { penalty, ledger, penaltyAmount };
 }
 
+// ── scan for flagged members without applying penalties ──────────────────
+
+/**
+ * Returns all overdue/failed members across active circles with penalty info.
+ * Does NOT create any records — read-only preview.
+ */
+export async function scanFlaggedMembers(cycleStartDate) {
+  const circles = await base44.entities.Circle.filter({ status: 'active' });
+  const flagged = [];
+
+  for (const circle of circles) {
+    const members = await base44.entities.Member.filter({ circle_id: circle.id });
+    const overdue = members.filter(m => m.payment_status === 'overdue' || m.payment_status === 'failed');
+
+    for (const member of overdue) {
+      const daysLate = calcDaysLate(circle, cycleStartDate);
+      const penaltyAmount = circle.penalty_enabled
+        ? calcPenaltyAmount(circle, circle.contribution_amount || 0, daysLate)
+        : 0;
+
+      // Check if already penalised this cycle
+      const existing = await base44.entities.PenaltyLedger.filter({
+        circle_id: circle.id,
+        member_id: member.id,
+        cycle: circle.current_cycle || 1,
+        settlement_status: 'outstanding',
+      });
+
+      flagged.push({
+        member,
+        circle,
+        daysLate,
+        penaltyAmount,
+        alreadyPenalised: existing.length > 0,
+        penaltyEnabled: !!circle.penalty_enabled,
+        withinGrace: daysLate <= (circle.penalty_grace_days || 0),
+      });
+    }
+  }
+
+  return flagged;
+}
+
 // ── scan all active circles for overdue members ────────────────────────────
 
 export async function runPenaltyScan() {
