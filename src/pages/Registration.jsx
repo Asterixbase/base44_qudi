@@ -5,10 +5,31 @@ import KenteStripe from '../components/qudi/KenteStripe';
 
 const STEPS = ['Personal', 'Identity', 'Verify', 'Terms'];
 
+const COUNTRIES = [
+  { code: 'GH', flag: '🇬🇭', name: 'Ghana',        currency: 'GHS', idLabel: 'Ghana Card (NIA)',         agency: 'NIA',   docName: 'Ghana Card' },
+  { code: 'NG', flag: '🇳🇬', name: 'Nigeria',       currency: 'NGN', idLabel: 'NIN — NIMC',               agency: 'NIMC',  docName: 'National ID (NIN)' },
+  { code: 'SN', flag: '🇸🇳', name: 'Senegal',       currency: 'XOF', idLabel: 'ECOWAS National ID',        agency: 'ANSD',  docName: 'National ID' },
+  { code: 'CI', flag: '🇨🇮', name: "Côte d'Ivoire", currency: 'XOF', idLabel: 'CNI — Carte Nationale',     agency: 'ONI',   docName: 'Carte Nationale' },
+  { code: 'ML', flag: '🇲🇱', name: 'Mali',          currency: 'XOF', idLabel: 'NINA — National ID',        agency: 'DGE',   docName: 'National ID' },
+  { code: 'BF', flag: '🇧🇫', name: 'Burkina Faso',  currency: 'XOF', idLabel: 'CNIB — National ID',        agency: 'ONEA',  docName: 'CNIB Card' },
+  { code: 'GN', flag: '🇬🇳', name: 'Guinea',        currency: 'GNF', idLabel: 'CNI — Guinean National ID', agency: 'MATD',  docName: 'National ID' },
+  { code: 'SL', flag: '🇸🇱', name: 'Sierra Leone',  currency: 'SLL', idLabel: 'NIC — National ID Card',    agency: 'NATCOM',docName: 'National ID Card' },
+  { code: 'LR', flag: '🇱🇷', name: 'Liberia',       currency: 'LRD', idLabel: 'National ID Card',          agency: 'NEC',   docName: 'National ID' },
+  { code: 'TG', flag: '🇹🇬', name: 'Togo',          currency: 'XOF', idLabel: 'CIN — Carte d\'Identité',  agency: 'ANID',  docName: 'Carte d\'Identité' },
+  { code: 'BJ', flag: '🇧🇯', name: 'Benin',         currency: 'XOF', idLabel: 'CIP — Carte d\'Identité',  agency: 'ANIP',  docName: 'Carte d\'Identité' },
+  { code: 'NE', flag: '🇳🇪', name: 'Niger',         currency: 'XOF', idLabel: 'NINA — National ID',        agency: 'ANSI',  docName: 'National ID' },
+  { code: 'GM', flag: '🇬🇲', name: 'Gambia',        currency: 'GMD', idLabel: 'GRTS — National ID',        agency: 'GRTS',  docName: 'National ID' },
+  { code: 'GW', flag: '🇬🇼', name: 'Guinea-Bissau', currency: 'XOF', idLabel: 'BI — Bilhete de Identidade',agency: 'INEC',  docName: 'Bilhete de Identidade' },
+  { code: 'CV', flag: '🇨🇻', name: 'Cape Verde',    currency: 'CVE', idLabel: 'BI — Bilhete de Identidade',agency: 'DGCI',  docName: 'Bilhete de Identidade' },
+  { code: 'MR', flag: '🇲🇷', name: 'Mauritania',    currency: 'MRU', idLabel: 'CNI — Carte Nationale',     agency: 'ANRPTS',docName: 'Carte Nationale' },
+  { code: 'UK', flag: '🇬🇧', name: 'United Kingdom',currency: 'GBP', idLabel: 'UK Passport / BRP',         agency: 'Onfido',docName: 'Passport / BRP' },
+];
+
 export default function Registration() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState({ fullName: '', phone: '', country: 'GH', idType: 'ghanaCard', otp: '' });
+  const [form, setForm] = useState({ fullName: '', phone: '', country: 'GH', otp: '' });
+  const selectedCountry = COUNTRIES.find(c => c.code === form.country) || COUNTRIES[0];
   const [kyc, setKyc] = useState('idle'); // idle | scanning | done
   const [errors, setErrors] = useState({});
 
@@ -82,9 +103,9 @@ export default function Registration() {
                 width: '100%', padding: '13px 14px', borderRadius: 10, fontSize: 15,
                 border: `1.5px solid ${C.border}`, background: C.white, color: C.ink,
               }}>
-                <option value="GH">🇬🇭 Ghana</option>
-                <option value="NG">🇳🇬 Nigeria</option>
-                <option value="UK">🇬🇧 United Kingdom</option>
+                {COUNTRIES.map(c => (
+                  <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.currency})</option>
+                ))}
               </select>
             </div>
           </>
@@ -94,7 +115,7 @@ export default function Registration() {
           <>
             <div style={{ fontSize: 16, fontWeight: 600, color: C.ink, marginBottom: 6 }}>Identity verification</div>
             <div style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>
-              {form.country === 'GH' ? 'Ghana Card (NIA)' : form.country === 'NG' ? 'NIN — NIMC' : 'UK Passport / BRP'}
+              {selectedCountry.idLabel}
             </div>
             {kyc === 'idle' ? (
               <div style={{
@@ -104,7 +125,7 @@ export default function Registration() {
                 <div style={{ fontSize: 40, marginBottom: 12 }}>🪪</div>
                 <div style={{ fontWeight: 600, color: C.ink, marginBottom: 8 }}>Scan your ID document</div>
                 <div style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>
-                  Hold your {form.country === 'UK' ? 'passport' : 'Ghana Card'} flat and well-lit
+                  Hold your {selectedCountry.docName} flat and well-lit
                 </div>
                 <button onClick={simulateKYC} style={{
                   background: C.gold, color: C.ink, border: 'none', borderRadius: 10,
@@ -128,8 +149,8 @@ export default function Registration() {
                 <div>
                   <div style={{ color: C.greenTx, fontWeight: 600, fontSize: 14 }}>Identity verified</div>
                   <div style={{ color: C.greenTx, fontSize: 12 }}>
-                    {form.country === 'GH' ? 'NIA' : form.country === 'NG' ? 'NIMC' : 'Onfido'} confirmed your identity
-                  </div>
+                      {selectedCountry.agency} confirmed your identity
+                    </div>
                 </div>
               </div>
             )}
