@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { offlineSync } from '@/lib/offlineSync';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
+import LowStockWidget from '@/components/LowStockWidget';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -85,6 +86,11 @@ export default function Dashboard() {
           )}
         </div>
       )}
+
+      {/* Low Stock Alert Widget */}
+      <div className="px-4 pt-2">
+        <LowStockWidget />
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 p-4">
