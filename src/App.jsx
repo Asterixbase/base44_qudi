@@ -31,6 +31,7 @@ import CashFlowForecast from './pages/CashFlowForecast';
 import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 import MemberProfile from './pages/MemberProfile';
 import CollectionMonitor from './pages/CollectionMonitor';
+import GuarantorHealth from './pages/GuarantorHealth';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -83,6 +84,7 @@ const AuthenticatedApp = () => {
       <Route path="/smart-payout" element={<SmartPayoutScheduler />} />
       <Route path="/member-profile" element={<MemberProfile />} />
       <Route path="/collection-monitor" element={<CollectionMonitor />} />
+      <Route path="/guarantor-health" element={<GuarantorHealth />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
