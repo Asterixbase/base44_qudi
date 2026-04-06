@@ -25,6 +25,24 @@ const COUNTRIES = [
   { code: 'UK', flag: '🇬🇧', name: 'United Kingdom',currency: 'GBP', idLabel: 'UK Passport / BRP',         agency: 'Onfido',docName: 'Passport / BRP' },
 ];
 
+function Field({ label, field, type = 'text', placeholder, inputMode, form, errors, update }) {
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>{label}</label>
+      <input
+        type={type} inputMode={inputMode} placeholder={placeholder}
+        value={form[field]} onChange={e => update(field, e.target.value)}
+        style={{
+          width: '100%', padding: '13px 14px', borderRadius: 10, fontSize: 15,
+          border: `1.5px solid ${errors[field] ? C.red : C.border}`,
+          background: C.white, color: C.ink, outline: 'none', boxSizing: 'border-box',
+        }}
+      />
+      {errors[field] && <div style={{ color: C.red, fontSize: 12, marginTop: 4 }}>{errors[field]}</div>}
+    </div>
+  );
+}
+
 export default function Registration() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -53,21 +71,7 @@ export default function Registration() {
     setTimeout(() => setKyc('done'), 2000);
   };
 
-  const Field = ({ label, field, type = 'text', placeholder, inputMode }) => (
-    <div style={{ marginBottom: 18 }}>
-      <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>{label}</label>
-      <input
-        type={type} inputMode={inputMode} placeholder={placeholder}
-        value={form[field]} onChange={e => update(field, e.target.value)}
-        style={{
-          width: '100%', padding: '13px 14px', borderRadius: 10, fontSize: 15,
-          border: `1.5px solid ${errors[field] ? C.red : C.border}`,
-          background: C.white, color: C.ink, outline: 'none', boxSizing: 'border-box',
-        }}
-      />
-      {errors[field] && <div style={{ color: C.red, fontSize: 12, marginTop: 4 }}>{errors[field]}</div>}
-    </div>
-  );
+
 
   return (
     <div style={{ minHeight: '100dvh', background: C.cream, maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
@@ -95,8 +99,8 @@ export default function Registration() {
         {step === 0 && (
           <>
             <div style={{ fontSize: 16, fontWeight: 600, color: C.ink, marginBottom: 20 }}>Tell us about yourself</div>
-            <Field label="Full name" field="fullName" placeholder="e.g. Akosua Asante" />
-            <Field label="MoMo phone number" field="phone" type="tel" inputMode="numeric" placeholder="+233 XX XXX XXXX" />
+            <Field label="Full name" field="fullName" placeholder="e.g. Akosua Asante" form={form} errors={errors} update={update} />
+            <Field label="MoMo phone number" field="phone" type="tel" inputMode="numeric" placeholder="+233 XX XXX XXXX" form={form} errors={errors} update={update} />
             <div style={{ marginBottom: 18 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>Country</label>
               <select value={form.country} onChange={e => update('country', e.target.value)} style={{
@@ -178,7 +182,7 @@ export default function Registration() {
             <div style={{ fontSize: 13, color: C.muted, marginBottom: 24 }}>
               A 6-digit code was sent to <strong style={{ color: C.ink }}>{form.phone || '+233 XX XXX XXXX'}</strong> via SMS
             </div>
-            <Field label="Verification code" field="otp" inputMode="numeric" placeholder="_ _ _ _ _ _" />
+            <Field label="Verification code" field="otp" inputMode="numeric" placeholder="_ _ _ _ _ _" form={form} errors={errors} update={update} />
             <button style={{
               background: 'none', border: 'none', color: C.goldText, fontSize: 14,
               fontWeight: 600, cursor: 'pointer', padding: 0, marginTop: -8,
