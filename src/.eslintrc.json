@@ -2,7 +2,8 @@
   "env": {
     "browser": true,
     "es2021": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "extends": [
     "eslint:recommended"
@@ -11,22 +12,21 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "globals": {
+    "describe": "readonly",
+    "it": "readonly",
+    "test": "readonly",
+    "expect": "readonly",
+    "beforeEach": "readonly",
+    "afterEach": "readonly",
+    "beforeAll": "readonly",
+    "afterAll": "readonly"
+  },
   "overrides": [
     {
-      "files": ["src/__tests__/**/*.js", "src/**/*.test.js", "src/**/*.spec.js"],
+      "files": ["**/__tests__/**", "**/*.test.js", "**/*.spec.js"],
       "env": {
-        "jest": true,
-        "node": true
-      },
-      "globals": {
-        "describe": "readonly",
-        "it": "readonly",
-        "test": "readonly",
-        "expect": "readonly",
-        "beforeEach": "readonly",
-        "afterEach": "readonly",
-        "beforeAll": "readonly",
-        "afterAll": "readonly"
+        "jest": true
       }
     }
   ]

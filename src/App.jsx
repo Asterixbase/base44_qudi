@@ -13,6 +13,7 @@ import Scanner from './pages/Scanner';
 import Stock from './pages/Stock';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import PurchaseOrders from './pages/PurchaseOrders';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
       <Route path="/stock" element={<Stock />} />
       <Route path="/reports" element={<Reports />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/purchase-orders" element={<PurchaseOrders />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
