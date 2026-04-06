@@ -1,0 +1,83 @@
+{
+  "name": "CrossBorderPayout",
+  "type": "object",
+  "properties": {
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "country": {
+      "type": "string",
+      "enum": [
+        "UK",
+        "US",
+        "EU",
+        "AUS"
+      ],
+      "title": "Diaspora Country"
+    },
+    "gbp_amount": {
+      "type": "number",
+      "title": "Amount in GBP"
+    },
+    "ghs_amount": {
+      "type": "number",
+      "title": "Amount in GHS"
+    },
+    "exchange_rate": {
+      "type": "number",
+      "title": "Applied Exchange Rate"
+    },
+    "compliance_fee_gbp": {
+      "type": "number",
+      "title": "FCA Compliance Fee (GBP)"
+    },
+    "compliance_fee_ghs": {
+      "type": "number",
+      "title": "Compliance Fee (GHS)"
+    },
+    "bank_account": {
+      "type": "string",
+      "title": "UK Bank Account (Last 4)"
+    },
+    "recipient_phone": {
+      "type": "string",
+      "title": "GHS Recipient MoMo"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "title": "Status"
+    },
+    "fca_reference": {
+      "type": "string",
+      "title": "FCA Reference Number"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "member_id",
+    "circle_id",
+    "country",
+    "gbp_amount",
+    "ghs_amount",
+    "status"
+  ]
+}
