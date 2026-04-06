@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import AdminRevenueChart from '@/components/AdminRevenueChart';
 import AdminTopProducts from '@/components/AdminTopProducts';
 import AdminStockTurnover from '@/components/AdminStockTurnover';
@@ -9,7 +10,27 @@ import { RefreshCw, Download } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+
+  // Restrict access to admin users only
+  if (user && user.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center max-w-sm">
+          <div className="text-5xl mb-4">🔒</div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Restricted</h1>
+          <p className="text-foreground/70 mb-6">Only admin users can access financial reports and inventory data.</p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-light transition"
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
   const [revenueData, setRevenueData] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [stockMetrics, setStockMetrics] = useState({
@@ -112,4 +133,3 @@ export default function AdminDashboard() {
 }
 
 export default AdminDashboard;
-}
