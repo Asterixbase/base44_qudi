@@ -2,6 +2,8 @@
 
 /* eslint-env jest */
 
+/* eslint-env jest */
+
 import { globalRateLimiter, checkRateLimit, RateLimitStrategies } from '../lib/rateLimiter';
 
 describe('Rate Limiter', () => {
