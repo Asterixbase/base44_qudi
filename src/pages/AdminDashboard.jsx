@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { checkAdminRole } from '../lib/roleGuard';
 import { C } from '../lib/qudiTokens';
 import Header from '../components/qudi/Header';
 import KenteStripe from '../components/qudi/KenteStripe';
@@ -19,18 +20,28 @@ export default function AdminDashboard() {
   const [transactions, setTransactions] = useState([]);
   const [penalties, setPenalties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      base44.entities.Circle.list('-created_date', 50),
-      base44.entities.Transaction.list('-created_date', 200),
-      base44.entities.Penalty.filter({ status: 'pending' }, '-created_date', 100),
-    ]).then(([c, t, p]) => {
-      setCircles(c);
-      setTransactions(t);
-      setPenalties(p);
-      setLoading(false);
-    });
+    async function load() {
+      const isAdmin = await checkAdminRole();
+      if (!isAdmin) {
+        setAccessDenied(true);
+        setLoading(false);
+        return;
+      }
+      Promise.all([
+        base44.entities.Circle.list('-created_date', 50),
+        base44.entities.Transaction.list('-created_date', 200),
+        base44.entities.Penalty.filter({ status: 'pending' }, '-created_date', 100),
+      ]).then(([c, t, p]) => {
+        setCircles(c);
+        setTransactions(t);
+        setPenalties(p);
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    }
+    load();
   }, []);
 
   // --- Derived metrics ---
@@ -91,6 +102,17 @@ export default function AdminDashboard() {
     { label: 'Pending Penalties', value: `GHS ${totalPendingPenalties.toLocaleString()}`, sub: `${penalties.length} cases`, color: '#C0392B' },
     { label: 'Transactions', value: transactions.length, sub: 'all types', color: '#2A9D8F' },
   ];
+
+  if (accessDenied) {
+    return (
+      <div style={{ minHeight: '100dvh', background: C.cream, maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+        <div style={{ fontWeight: 700, color: C.ink, marginBottom: 6 }}>Admin access required</div>
+        <div style={{ fontSize: 13, color: C.muted, marginBottom: 16, textAlign: 'center' }}>You don't have permission to view this dashboard.</div>
+        <button onClick={() => navigate('/dashboard')} style={{ color: C.goldText, background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer' }}>← Go back</button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100dvh', background: C.cream, maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>

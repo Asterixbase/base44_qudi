@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { checkAdminRole } from '../lib/roleGuard';
 import { C } from '../lib/qudiTokens';
 import Header from '../components/qudi/Header';
 import KenteStripe from '../components/qudi/KenteStripe';
@@ -29,9 +30,16 @@ export default function GuarantorHealth() {
   const [flagging, setFlagging] = useState(null);
   const [flagReason, setFlagReason] = useState('');
   const [showFlagForm, setShowFlagForm] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
     async function load() {
+      const isAdmin = await checkAdminRole();
+      if (!isAdmin) {
+        setAccessDenied(true);
+        setLoading(false);
+        return;
+      }
       const data = await getAllGuarantorHealth();
       setGuarantors(data);
       if (data.length > 0) setSelected(data[0]);
@@ -51,6 +59,17 @@ export default function GuarantorHealth() {
     setFlagReason('');
     // Optionally refresh
   };
+
+  if (accessDenied) {
+    return (
+      <div style={{ minHeight: '100dvh', background: C.cream, maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
+        <div style={{ fontWeight: 700, color: C.ink, marginBottom: 6 }}>Admin access required</div>
+        <div style={{ fontSize: 13, color: C.muted, marginBottom: 16, textAlign: 'center' }}>You don't have permission to view this dashboard.</div>
+        <button onClick={() => navigate('/dashboard')} style={{ color: C.goldText, background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer' }}>← Go back</button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100dvh', background: C.cream, maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>

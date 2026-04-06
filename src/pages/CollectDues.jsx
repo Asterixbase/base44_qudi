@@ -42,14 +42,14 @@ export default function CollectDues() {
       }
       delay += 1200;
       setTimeout(() => {
-        const outcome = m.payment_status === 'failed' ? 'failed' : 'paid';
-        setResults(r => ({ ...r, [m.id]: outcome }));
-        // Save to DB
-        base44.entities.Transaction.create({
-          circle_id: 'c1', member_id: m.id, member_name: m.full_name,
-          type: 'collection', amount: 200, status: outcome,
-          momo_ref: `QC${Date.now()}`, cycle: 3,
-        }).catch(() => {});
+       const outcome = m.payment_status === 'failed' ? 'failed' : 'paid';
+       setResults(r => ({ ...r, [m.id]: outcome }));
+       // Save to DB
+       base44.entities.Transaction.create({
+         circle_id: 'c1', member_id: m.id, member_name: m.full_name,
+         type: 'collection', amount: 200, status: outcome,
+         momo_ref: `QC${Date.now()}`, cycle: 3,
+       }).catch(err => console.error('Transaction save failed:', err));
       }, delay);
     });
     setTimeout(() => setCollecting(false), delay + 500);
