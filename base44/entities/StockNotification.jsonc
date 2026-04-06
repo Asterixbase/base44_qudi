@@ -1,0 +1,55 @@
+{
+  "name": "StockNotification",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "low_stock",
+        "expired"
+      ],
+      "title": "Notification Type"
+    },
+    "product_id": {
+      "type": "string",
+      "title": "Product ID"
+    },
+    "product_name": {
+      "type": "string",
+      "title": "Product Name"
+    },
+    "product_sku": {
+      "type": "string",
+      "title": "Product SKU"
+    },
+    "current_quantity": {
+      "type": "number",
+      "title": "Current Quantity"
+    },
+    "reorder_level": {
+      "type": "number",
+      "title": "Reorder Level"
+    },
+    "location": {
+      "type": "string",
+      "title": "Storage Location"
+    },
+    "expiry_date": {
+      "type": "string",
+      "title": "Expiry Date (ISO)"
+    },
+    "read": {
+      "type": "boolean",
+      "title": "Read by Admin"
+    },
+    "action_taken": {
+      "type": "boolean",
+      "title": "Action Taken"
+    }
+  },
+  "required": [
+    "type",
+    "product_id",
+    "product_name"
+  ]
+}
