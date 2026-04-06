@@ -23,6 +23,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import InventoryMetricsDashboard from './pages/InventoryMetricsDashboard';
 import SikasemDashboard from './pages/SikasemDashboard';
 import Sale from './pages/Sale';
+import CreditSecure from './pages/CreditSecure';
+import ComplianceDashboard from './pages/ComplianceDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -64,6 +66,8 @@ const AuthenticatedApp = () => {
       <Route path="/inventory-metrics" element={<InventoryMetricsDashboard />} />
       <Route path="/sikasem-dashboard" element={<SikasemDashboard />} />
       <Route path="/sale" element={<Sale />} />
+      <Route path="/credit-secure" element={<CreditSecure />} />
+      <Route path="/compliance" element={<ComplianceDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

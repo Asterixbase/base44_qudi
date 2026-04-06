@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useOfflineStore } from '@/lib/stores/offlineStore';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
+import { checkCreditFraud, shouldRequireApproval } from '@/lib/fraudDetection';
+import { ComplianceAudit } from '@/lib/complianceAudit';
+import { encrypt } from '@/lib/encryption';
+import BiometricAuth from '@/lib/biometricAuth';
 import { Plus, Trash2, Search } from 'lucide-react';
 
 export default function Sale() {
@@ -13,7 +17,10 @@ export default function Sale() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fraudAlerts, setFraudAlerts] = useState([]);
+  const [requiresApproval, setRequiresApproval] = useState(null);
   const { queueTransaction } = useOfflineStore();
+  const [audit] = useState(new ComplianceAudit('shop-001', 'user-001'));
 
   useEffect(() => {
     loadProducts();
@@ -77,15 +84,46 @@ export default function Sale() {
     }
 
     setLoading(true);
+    setFraudAlerts([]);
+    setRequiresApproval(null);
+
     try {
+      const totalAmount = cart.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0) / 100;
+
+      // FRAUD CHECK (if credit sale)
+      if (paymentMethod === 'credit') {
+        const userHistory = await base44.entities.Transaction.filter({ created_by: (await base44.auth.me()).email });
+        const fraudCheck = await checkCreditFraud(
+          { amount: totalAmount, payment_method: 'credit', customer_phone: 'pending', dueDate: new Date(Date.now() + 7 * 86400000).toISOString() },
+          userHistory
+        );
+        if (!fraudCheck.safe) {
+          setFraudAlerts(fraudCheck.alerts);
+          const approval = shouldRequireApproval(fraudCheck.riskScore);
+          if (approval && approval !== 'log_only') {
+            setRequiresApproval(approval);
+            setLoading(false);
+            alert(`⚠️ Fraud check: ${fraudCheck.alerts.map(a => a.message).join('; ')}\nApproval: ${approval}`);
+            return;
+          }
+        }
+      }
+
       // Create transaction record for each item sold
       const transactions = cart.map(item => ({
         product_id: item.id,
         product_name: item.name,
-        type: 'out',
+        type: paymentMethod === 'credit' ? 'credit' : 'out',
         quantity: item.quantity,
+        amount: item.unit_price * item.quantity / 100,
+        payment_method: paymentMethod,
         reference: `SALE-${Date.now()}`,
       }));
+
+      // LOG TO COMPLIANCE AUDIT (GRA/BoG)
+      for (const txn of transactions) {
+        await audit.logTransaction(txn);
+      }
 
       if (navigator.onLine) {
         await Promise.all(
@@ -98,25 +136,30 @@ export default function Sale() {
 
       // Reset cart and show success
       setCart([]);
-      alert(`Sale recorded: GHS ${totalGHS} (${paymentMethod})`);
+      alert(`✓ Sale recorded: GHS ${totalGHS} (${paymentMethod})\n✓ Audit trail logged`);
       navigate('/dashboard');
     } catch (error) {
       console.error('Checkout failed:', error);
       // Queue on error
       cart.forEach(item => {
-        queueTransaction({
-          product_id: item.id,
-          product_name: item.name,
-          type: 'out',
-          quantity: item.quantity,
-          reference: `SALE-${Date.now()}`,
-        });
+       queueTransaction({
+         product_id: item.id,
+         product_name: item.name,
+         type: paymentMethod === 'credit' ? 'credit' : 'out',
+         quantity: item.quantity,
+         reference: `SALE-${Date.now()}`,
+       });
       });
       alert('Sale queued (offline)');
       setCart([]);
-    } finally {
+      } finally {
       setLoading(false);
-    }
+      }
+
+      // Show fraud alerts if any
+      if (fraudAlerts.length > 0) {
+      console.warn('Fraud alerts:', fraudAlerts);
+      }
   };
 
   return (
