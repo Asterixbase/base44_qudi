@@ -7,6 +7,16 @@
 const FREQUENCY_DAYS = { weekly: 7, monthly: 30 };
 
 /**
+ * Given a circle and an explicit cycle start date, return the next contribution deadline.
+ */
+export function getNextContributionDateFromStart(circle, startDate) {
+  const freqDays = FREQUENCY_DAYS[circle.frequency] || 30;
+  const base = startDate ? new Date(startDate) : (circle.created_date ? new Date(circle.created_date) : new Date());
+  const cycle = circle.current_cycle || 1;
+  return new Date(base.getTime() + cycle * freqDays * 86400000);
+}
+
+/**
  * Given a circle, return the ISO date string of the next contribution deadline.
  * We use the circle's created_date + (current_cycle * frequency_days) as an approximation.
  */
@@ -52,6 +62,58 @@ export function buildReminderMessage(member, circle, tier) {
     'due-today': `🔔 TODAY is payment day! Your GHS ${amount} contribution to "${name}" must be paid now via MoMo to avoid penalties. — Qudi`,
   };
   return msgs[tier] || '';
+}
+
+/**
+ * Run automated reminder blast: fetch all active circles, find members within
+ * 3 days of their deadline (based on cycleStartDate), send in-app notifications.
+ * Returns { sent: [], skipped: [] }
+ */
+export async function runAutoReminders(base44Client, cycleStartDate) {
+  const circles = await base44Client.entities.Circle.filter({ status: 'active' });
+  const sent = [];
+  const skipped = [];
+
+  for (const circle of circles) {
+    const members = await base44Client.entities.Member.filter({ circle_id: circle.id });
+    const deadline = getNextContributionDateFromStart(circle, cycleStartDate || circle.created_date);
+    const daysLeft = daysUntil(deadline);
+    const tier = getReminderTier(daysLeft);
+
+    // Only fire for 0–3 day window
+    if (!tier) {
+      skipped.push({ circle: circle.name, reason: `${daysLeft} days away — outside reminder window` });
+      continue;
+    }
+
+    for (const member of members) {
+      if (member.payment_status === 'paid') {
+        skipped.push({ name: member.full_name, circle: circle.name, reason: 'Already paid' });
+        continue;
+      }
+
+      const message = buildReminderMessage(member, circle, tier.tier);
+      await base44Client.entities.Notification.create({
+        circle_id:   circle.id,
+        member_id:   member.id,
+        member_name: member.full_name,
+        phone:       member.phone || 'N/A',
+        message,
+        status:  'sent',
+        channel: 'in-app',
+      });
+
+      sent.push({
+        name:    member.full_name,
+        circle:  circle.name,
+        daysLeft,
+        tier:    tier.tier,
+        message,
+      });
+    }
+  }
+
+  return { sent, skipped };
 }
 
 /**
