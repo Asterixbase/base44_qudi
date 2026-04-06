@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Splash from './pages/Splash';
 import Dashboard from './pages/Dashboard';
+import MetricsDashboard from './pages/MetricsDashboard';
 import Scanner from './pages/Scanner';
 import Stock from './pages/Stock';
 import Reports from './pages/Reports';
@@ -36,6 +37,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<Splash />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/metrics" element={<MetricsDashboard />} />
       <Route path="/scan" element={<Scanner />} />
       <Route path="/stock" element={<Stock />} />
       <Route path="/reports" element={<Reports />} />
