@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import MetricsDashboard from './pages/MetricsDashboard';
 import StockAlerts from './pages/StockAlerts';
 import StockNotifications from './pages/StockNotifications';
+import StockPredictions from './pages/StockPredictions';
 import Scanner from './pages/Scanner';
 import Stock from './pages/Stock';
 import Reports from './pages/Reports';
@@ -43,6 +44,7 @@ const AuthenticatedApp = () => {
       <Route path="/metrics" element={<MetricsDashboard />} />
       <Route path="/alerts" element={<StockAlerts />} />
       <Route path="/notifications" element={<StockNotifications />} />
+      <Route path="/predictions" element={<StockPredictions />} />
       <Route path="/scan" element={<Scanner />} />
       <Route path="/stock" element={<Stock />} />
       <Route path="/reports" element={<Reports />} />

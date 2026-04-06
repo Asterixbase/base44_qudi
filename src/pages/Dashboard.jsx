@@ -121,6 +121,7 @@ export default function Dashboard() {
         <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wider">Quick Actions</h2>
         <QuickActionButton label="Scan Barcode" icon="📱" onClick={() => navigate('/scan')} />
         <QuickActionButton label="Check Stock" icon="📊" onClick={() => navigate('/stock')} />
+        <QuickActionButton label="AI Predictions" icon="🤖" onClick={() => navigate('/predictions')} />
         <QuickActionButton label="Reports" icon="📈" onClick={() => navigate('/reports')} />
         <QuickActionButton label="Settings" icon="⚙️" onClick={() => navigate('/settings')} />
       </div>
