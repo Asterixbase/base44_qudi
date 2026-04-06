@@ -25,6 +25,7 @@ import PayoutDistribution from './pages/PayoutDistribution';
 import InsuranceManagement from './pages/InsuranceManagement';
 import AutoPenaltyScanner from './pages/AutoPenaltyScanner';
 import ReconciliationPage from './pages/ReconciliationPage';
+import PayoutRoadmap from './pages/PayoutRoadmap';
 import MemberContributionHistory from './pages/MemberContributionHistory';
 
 const AuthenticatedApp = () => {
@@ -72,6 +73,7 @@ const AuthenticatedApp = () => {
       <Route path="/insurance" element={<InsuranceManagement />} />
       <Route path="/auto-penalties" element={<AutoPenaltyScanner />} />
       <Route path="/reconciliation" element={<ReconciliationPage />} />
+      <Route path="/payout-roadmap" element={<PayoutRoadmap />} />
       <Route path="/member-history" element={<MemberContributionHistory />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

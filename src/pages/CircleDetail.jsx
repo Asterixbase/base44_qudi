@@ -113,6 +113,10 @@ export default function CircleDetail() {
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 8, padding: '0 16px', marginBottom: 16 }}>
+          <Link to="/payout-roadmap" state={{ circle }} style={{
+            flex: 1, background: C.blueBg, color: C.blue, border: `0.5px solid ${C.blue}`,
+            borderRadius: 10, padding: '12px', textAlign: 'center', fontWeight: 700, fontSize: 13, textDecoration: 'none',
+          }}>🗺 Roadmap</Link>
           <Link to="/collect-dues" style={{
             flex: 1, background: C.gold, color: C.ink, border: 'none', borderRadius: 10,
             padding: '12px', textAlign: 'center', fontWeight: 700, fontSize: 13, textDecoration: 'none',
