@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function Stock() {
   const navigate = useNavigate();
@@ -44,8 +45,11 @@ export default function Stock() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Offline Sync Banner */}
+      <OfflineSyncBanner />
+
       {/* Header */}
-      <div className="bg-primary text-white p-4 sticky top-0 z-50">
+      <div className="bg-primary text-white p-4 sticky top-0 z-40">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="text-xl">←</button>
           <h1 className="text-xl font-bold">Stock Levels</h1>

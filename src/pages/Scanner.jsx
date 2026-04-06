@@ -4,6 +4,8 @@ import { useScan } from '@/hooks/useScan';
 import { barcodeParser } from '@/lib/barcodeParser';
 import { offlineSync } from '@/lib/offlineSync';
 import { base44 } from '@/api/base44Client';
+import { useOfflineStore } from '@/lib/stores/offlineStore';
+import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function Scanner() {
   const navigate = useNavigate();
@@ -25,6 +27,8 @@ export default function Scanner() {
     }
   };
 
+  const queueTransaction = useOfflineStore((state) => state.queueTransaction);
+
   const handleSaveTransaction = async () => {
     if (!scannedData) return;
 
@@ -40,14 +44,20 @@ export default function Scanner() {
       if (navigator.onLine) {
         await base44.entities.Transaction.create(transaction);
       } else {
-        offlineSync.queueTransaction({ ...transaction, type: 'transaction' });
+        queueTransaction(transaction);
       }
 
       setScannedData(null);
       setQuantity(1);
       alert('Transaction saved!');
     } catch (err) {
-      alert('Error: ' + err.message);
+      queueTransaction({
+        barcode_value: scannedData.value,
+        type: transactionType,
+        quantity: parseInt(quantity),
+        timestamp: new Date().toISOString(),
+      });
+      alert('Saved offline. Will sync when online.');
     } finally {
       setLoading(false);
     }
@@ -55,6 +65,9 @@ export default function Scanner() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Offline Sync Banner */}
+      <OfflineSyncBanner />
+
       {/* Header */}
       <div className="bg-primary text-white p-4 flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="text-xl">←</button>

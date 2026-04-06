@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function Reports() {
   const navigate = useNavigate();
@@ -48,6 +49,9 @@ export default function Reports() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Offline Sync Banner */}
+      <OfflineSyncBanner />
+
       {/* Header */}
       <div className="bg-primary text-white p-4">
         <div className="flex items-center gap-3 mb-4">

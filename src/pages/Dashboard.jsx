@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { offlineSync } from '@/lib/offlineSync';
+import { useOfflineSync } from '@/hooks/useOfflineSync';
+import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { performSync } = useOfflineSync();
   const [stats, setStats] = useState({
     totalProducts: 0,
     lowStock: 0,
@@ -51,26 +54,17 @@ export default function Dashboard() {
   };
 
   const handleSync = async () => {
-    const queue = offlineSync.getQueue();
-    if (queue.length === 0) return;
-
-    try {
-      for (const item of queue) {
-        if (item.type === 'transaction') {
-          await base44.entities.Transaction.create(item);
-        }
-      }
-      offlineSync.clearQueue();
-      loadStats();
-    } catch (error) {
-      console.error('Sync failed:', error);
-    }
+    await performSync();
+    loadStats();
   };
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Offline Sync Banner */}
+      <OfflineSyncBanner />
+
       {/* Header */}
-      <div className="bg-primary text-white p-4 sticky top-0 z-50">
+      <div className="bg-primary text-white p-4 sticky top-0 z-40">
         <h1 className="text-2xl font-bold">Sikasem</h1>
         <p className="text-sm text-primary-light opacity-80">{isOnline ? '🟢 Online' : '🔴 Offline'}</p>
       </div>
