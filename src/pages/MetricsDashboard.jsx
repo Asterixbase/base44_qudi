@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import DailyTransactionChart from '@/components/DailyTransactionChart';
 import TopProductsChart from '@/components/TopProductsChart';
 import StockDepletionChart from '@/components/StockDepletionChart';
+import StockPredictionDashboard from '@/components/StockPredictionDashboard';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function MetricsDashboard() {
@@ -105,6 +106,12 @@ export default function MetricsDashboard() {
         </div>
       ) : (
         <div className="p-4 space-y-6">
+          {/* Predictive Analytics */}
+          <div>
+            <h2 className="text-lg font-bold mb-4 text-foreground">Stock Predictions</h2>
+            <StockPredictionDashboard />
+          </div>
+
           {/* Charts Grid */}
           <div className="space-y-6">
             {dailyData.length > 0 && <DailyTransactionChart data={dailyData} />}
