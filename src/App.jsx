@@ -30,6 +30,7 @@ import MemberContributionHistory from './pages/MemberContributionHistory';
 import CashFlowForecast from './pages/CashFlowForecast';
 import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 import MemberProfile from './pages/MemberProfile';
+import CollectionMonitor from './pages/CollectionMonitor';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -81,6 +82,7 @@ const AuthenticatedApp = () => {
       <Route path="/cash-flow-forecast" element={<CashFlowForecast />} />
       <Route path="/smart-payout" element={<SmartPayoutScheduler />} />
       <Route path="/member-profile" element={<MemberProfile />} />
+      <Route path="/collection-monitor" element={<CollectionMonitor />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -6,7 +6,7 @@ const NAV_ITEMS = [
   { label: 'Home',      icon: '⌂',  path: '/dashboard' },
   { label: 'Circles',   icon: '◎',  path: '/circle-detail' },
   { label: 'Reminders', icon: '🔔', path: '/reminders' },
-  { label: 'Disputes',  icon: '🚩', path: '/disputes' },
+  { label: 'Alerts',    icon: '🚨', path: '/collection-monitor' },
   { label: 'More',      icon: '···',path: '/dashboard' },
 ];
 
