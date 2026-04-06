@@ -33,6 +33,7 @@ import MemberProfile from './pages/MemberProfile';
 import CollectionMonitor from './pages/CollectionMonitor';
 import GuarantorHealth from './pages/GuarantorHealth';
 import CrossBorderPayouts from './pages/CrossBorderPayouts';
+import ArchitectureOverview from './pages/ArchitectureOverview';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
       <Route path="/collection-monitor" element={<CollectionMonitor />} />
       <Route path="/guarantor-health" element={<GuarantorHealth />} />
       <Route path="/cross-border" element={<CrossBorderPayouts />} />
+      <Route path="/architecture" element={<ArchitectureOverview />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
