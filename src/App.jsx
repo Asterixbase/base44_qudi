@@ -17,6 +17,7 @@ import Stock from './pages/Stock';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import PurchaseOrders from './pages/PurchaseOrders';
+import StockForecasting from './pages/StockForecasting';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,6 +53,7 @@ const AuthenticatedApp = () => {
       <Route path="/reports" element={<Reports />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/purchase-orders" element={<PurchaseOrders />} />
+      <Route path="/forecasting" element={<StockForecasting />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

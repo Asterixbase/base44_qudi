@@ -1,0 +1,71 @@
+{
+  "name": "StockForecast",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "title": "Product ID"
+    },
+    "product_name": {
+      "type": "string",
+      "title": "Product Name"
+    },
+    "product_sku": {
+      "type": "string",
+      "title": "Product SKU"
+    },
+    "current_quantity": {
+      "type": "number",
+      "title": "Current Stock Level"
+    },
+    "daily_velocity": {
+      "type": "number",
+      "title": "Avg Daily Sales Velocity"
+    },
+    "predicted_low_stock_date": {
+      "type": "string",
+      "title": "Predicted Low Stock Date (ISO)"
+    },
+    "days_until_low_stock": {
+      "type": "number",
+      "title": "Days Until Low Stock"
+    },
+    "reorder_level": {
+      "type": "number",
+      "title": "Reorder Threshold"
+    },
+    "recommended_order_quantity": {
+      "type": "number",
+      "title": "Recommended Order Quantity"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "title": "Urgency Level"
+    },
+    "confidence": {
+      "type": "number",
+      "title": "Forecast Confidence (%)"
+    },
+    "trend_analysis": {
+      "type": "string",
+      "title": "AI Trend Analysis"
+    },
+    "notification_sent": {
+      "type": "boolean",
+      "title": "Notification Sent"
+    },
+    "forecast_date": {
+      "type": "string",
+      "title": "Forecast Generated Date (ISO)"
+    }
+  },
+  "required": [
+    "product_id",
+    "product_name",
+    "current_quantity",
+    "daily_velocity",
+    "urgency",
+    "forecast_date"
+  ]
+}
