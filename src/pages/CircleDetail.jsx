@@ -14,6 +14,7 @@ import NavBar from '../components/qudi/NavBar';
 import { enrichMembersWithTrust } from '../lib/trustScore';
 import CircleSummaryPDF from '../components/qudi/CircleSummaryPDF';
 import DisputeModal from '../components/qudi/DisputeModal';
+import PenaltyBanner from '../components/qudi/PenaltyBanner';
 
 const DEMO_MEMBERS = [
   { id: 'm1', initials: 'AA', full_name: 'Akosua Asante', payout_position: 1, payment_status: 'paid',    trust_score: 92, is_verified: true },
@@ -120,11 +121,18 @@ export default function CircleDetail() {
             flex: 1, background: C.ink, color: C.cream, border: 'none', borderRadius: 10,
             padding: '12px', textAlign: 'center', fontWeight: 700, fontSize: 13, textDecoration: 'none',
           }}>Pay out</Link>
-          <button style={{
+          <Link to="/penalty-settings" state={{ circle }} style={{
             flex: 1, background: C.tealBg, color: C.tealTx, border: `0.5px solid ${C.teal}`,
-            borderRadius: 10, padding: '12px', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-          }}>Insure</button>
+            borderRadius: 10, padding: '12px', textAlign: 'center', fontWeight: 700, fontSize: 13, textDecoration: 'none',
+          }}>Penalties</Link>
         </div>
+
+        {/* Penalty banners for overdue/failed members */}
+        {enrichedMembers.filter(m => ['failed','overdue'].includes(getMemberStatus(m))).map(m => (
+          <div key={m.id} style={{ padding: '0 16px' }}>
+            <PenaltyBanner circle={circle} member={{ ...m, payment_status: getMemberStatus(m) }} daysLate={2} />
+          </div>
+        ))}
 
         {/* Reminders */}
         <ReminderButton members={DEMO_MEMBERS} circle={circle} />

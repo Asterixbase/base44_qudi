@@ -69,6 +69,39 @@
     "is_insured": {
       "type": "boolean",
       "title": "Insured"
+    },
+    "penalty_enabled": {
+      "type": "boolean",
+      "title": "Penalties Enabled"
+    },
+    "penalty_type": {
+      "type": "string",
+      "enum": [
+        "flat_fee",
+        "percentage",
+        "daily_interest"
+      ],
+      "title": "Penalty Type"
+    },
+    "penalty_flat_fee": {
+      "type": "number",
+      "title": "Flat Fee Amount (GHS)"
+    },
+    "penalty_percentage": {
+      "type": "number",
+      "title": "Penalty % of Contribution"
+    },
+    "penalty_daily_rate": {
+      "type": "number",
+      "title": "Daily Interest Rate (%)"
+    },
+    "penalty_grace_days": {
+      "type": "number",
+      "title": "Grace Period (days)"
+    },
+    "penalty_notify_guarantor": {
+      "type": "boolean",
+      "title": "Notify Guarantor on Penalty"
     }
   },
   "required": [

@@ -14,6 +14,7 @@ import SendPayout from './pages/SendPayout';
 // Add page imports here
 import DisputeDashboard from './pages/DisputeDashboard';
 import ReminderSchedule from './pages/ReminderSchedule';
+import PenaltySettings from './pages/PenaltySettings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -49,6 +50,7 @@ const AuthenticatedApp = () => {
       <Route path="/send-payout" element={<SendPayout />} />
       <Route path="/disputes" element={<DisputeDashboard />} />
       <Route path="/reminders" element={<ReminderSchedule />} />
+      <Route path="/penalty-settings" element={<PenaltySettings />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

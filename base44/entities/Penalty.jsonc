@@ -1,0 +1,75 @@
+{
+  "name": "Penalty",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "guarantor_name": {
+      "type": "string",
+      "title": "Guarantor Name"
+    },
+    "cycle": {
+      "type": "number",
+      "title": "Cycle Number"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "flat_fee",
+        "percentage",
+        "daily_interest"
+      ],
+      "title": "Penalty Type"
+    },
+    "original_amount": {
+      "type": "number",
+      "title": "Original Contribution (GHS)"
+    },
+    "penalty_amount": {
+      "type": "number",
+      "title": "Penalty Amount (GHS)"
+    },
+    "days_late": {
+      "type": "number",
+      "title": "Days Late"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "waived"
+      ],
+      "title": "Status"
+    },
+    "member_notified": {
+      "type": "boolean",
+      "title": "Member Notified"
+    },
+    "guarantor_notified": {
+      "type": "boolean",
+      "title": "Guarantor Notified"
+    },
+    "note": {
+      "type": "string",
+      "title": "Organiser Note"
+    }
+  },
+  "required": [
+    "circle_id",
+    "member_name",
+    "type",
+    "penalty_amount",
+    "status"
+  ]
+}
