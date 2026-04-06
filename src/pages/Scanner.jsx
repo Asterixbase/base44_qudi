@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useScan } from '@/hooks/useScan';
+import BarcodeScanner from '@/components/BarcodeScanner';
 import { barcodeParser } from '@/lib/barcodeParser';
 import { offlineSync } from '@/lib/offlineSync';
 import { base44 } from '@/api/base44Client';
@@ -15,17 +15,23 @@ export default function Scanner() {
   const [quantity, setQuantity] = useState(1);
   const [transactionType, setTransactionType] = useState('in');
   const [loading, setLoading] = useState(false);
-  const [focusedInput, setFocusedInput] = useState(null);
+  const [cameraActive, setCameraActive] = useState(false);
+
+  const handleBarcodeScanned = (barcode) => {
+    // Process scanned barcode
+    const data = {
+      value: barcode,
+      type: 'ean13', // Default type for camera scans
+    };
+    setScannedData(data);
+    setCameraActive(false);
+  };
 
   const handleBarcodeSubmit = async (e) => {
     e.preventDefault();
     if (!manualBarcode) return;
-
-    const parsed = barcodeParser.parseBarcode(manualBarcode);
-    if (parsed) {
-      setScannedData(parsed);
-      setManualBarcode('');
-    }
+    handleBarcodeScanned(manualBarcode);
+    setManualBarcode('');
   };
 
   const queueTransaction = useOfflineStore((state) => state.queueTransaction);
@@ -78,70 +84,29 @@ export default function Scanner() {
         </div>
       </div>
 
-      {/* Camera View */}
-      {scanning ? (
-        <div className="relative w-full">
-          <div className="relative bg-black w-full" style={{ aspectRatio: '9/12' }}>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-            {/* Scanning Frame Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-4/5 h-1/2 border-4 border-yellow-400 rounded-lg shadow-lg" style={{
-                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
-              }}></div>
-            </div>
-            {/* Scanning Status */}
-            <div className="absolute top-4 left-4 right-4 bg-black/60 text-white px-3 py-2 rounded-lg text-sm text-center">
-              Point camera at barcode
-            </div>
-          </div>
+      {/* Barcode Scanner */}
+      <div className="p-4">
+        <BarcodeScanner isActive={cameraActive} onScan={handleBarcodeScanned} />
+        {!cameraActive && !scannedData && (
           <button
-            onClick={stopScan}
-            className="w-full bg-destructive text-white py-4 font-semibold text-lg hover:bg-red-700 transition"
+            onClick={() => setCameraActive(true)}
+            className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-light transition"
           >
-            Stop Scanning
+            📷 Start Camera Scan
           </button>
-        </div>
-      ) : (
-        <button
-          onClick={startScan}
-          className="w-full mx-4 mt-4 aspect-video bg-gradient-to-br from-primary to-primary-light text-white border-2 border-primary rounded-xl flex flex-col items-center justify-center gap-4 hover:shadow-lg transition shadow-md"
-        >
-          <span className="text-6xl">📷</span>
-          <div className="text-center">
-            <p className="font-bold text-lg">Start Camera Scan</p>
-            <p className="text-sm text-primary-light opacity-90 mt-1">Tap to activate camera</p>
-          </div>
-        </button>
-      )}
-
-      {error && (
-        <div className="bg-destructive/10 border-2 border-destructive p-4 m-4 rounded-lg text-destructive text-sm font-medium">
-          ⚠️ {error}
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Manual Entry */}
-      <form onSubmit={handleBarcodeSubmit} className="p-4 space-y-3">
+      <form onSubmit={handleBarcodeSubmit} className="p-4 space-y-3" style={{ display: cameraActive ? 'none' : 'block' }}>
         <div>
           <label className="block text-sm font-semibold mb-3 text-foreground/80">Manual Entry</label>
           <input
             type="text"
             value={manualBarcode}
             onChange={(e) => setManualBarcode(e.target.value)}
-            onFocus={() => setFocusedInput('barcode')}
-            onBlur={() => setFocusedInput(null)}
-            placeholder="Scan or type barcode"
-            className={`w-full border-2 rounded-lg px-4 py-4 font-mono text-base focus:outline-none transition ${
-              focusedInput === 'barcode'
-                ? 'border-primary ring-2 ring-primary/20 bg-primary/5'
-                : 'border-border'
-            }`}
-            autoFocus
+            placeholder="Type barcode"
+            className="w-full border-2 border-border rounded-lg px-4 py-4 font-mono text-base focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
         <button
