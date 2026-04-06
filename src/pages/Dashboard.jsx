@@ -156,40 +156,6 @@ export default function Dashboard() {
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#FFF3D6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.goldText, fontWeight: 700, fontSize: 20 }}>+</div>
             <span style={{ fontWeight: 600, color: C.ink, fontSize: 14 }}>Create new circle</span>
           </div>
-
-          {/* Mixed circles (Coming Soon) */}
-          <div style={{
-            background: C.ink, borderRadius: 12, padding: '14px', marginBottom: 16,
-            display: 'flex', alignItems: 'center', gap: 12,
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ color: C.cream, fontWeight: 700, fontSize: 13 }}>Mixed circles</div>
-              <div style={{ color: C.hintOnDark, fontSize: 12 }}>Ghana + UK diaspora in one circle</div>
-              <div style={{ color: C.hintOnDark, fontSize: 11, marginTop: 4 }}>GBP ↔ GHS · Cross-border · FCA regulated</div>
-            </div>
-            <span style={{ background: C.amberBg, color: C.amberTx, borderRadius: 6, padding: '4px 8px', fontSize: 11, fontWeight: 600 }}>Coming soon</span>
-          </div>
-        </div>
-
-        {/* Alerts */}
-        <div style={{ padding: '0 16px 16px' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 10 }}>Alerts</div>
-          {[
-            { text: "Ama Osei's payment failed — guarantor charged ₵200.", bg: C.redBg, border: C.red, color: C.redTx, cta: 'Review', path: '/circle-detail' },
-            { text: 'Insurance claim CLM-A3F8 under GLICO review.', bg: C.amberBg, border: C.gold, color: C.amberTx, cta: 'Track', path: '/dashboard' },
-          ].map((a, i) => (
-            <div key={i} style={{
-              background: a.bg, border: `1px solid ${a.border}`,
-              borderRadius: 10, padding: '10px 12px', marginBottom: 8,
-              display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-              <span style={{ flex: 1, color: a.color, fontSize: 13 }}>{a.text}</span>
-              <Link to={a.path} style={{
-                background: a.border, color: C.white, borderRadius: 6,
-                padding: '5px 12px', fontSize: 12, fontWeight: 600, textDecoration: 'none', flexShrink: 0,
-              }}>{a.cta}</Link>
-            </div>
-          ))}
         </div>
       </div>
 
