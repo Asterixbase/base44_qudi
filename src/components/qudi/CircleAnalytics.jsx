@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { C } from '../../lib/qudiTokens';
 
 // Mock historical contribution data per cycle
@@ -13,8 +13,9 @@ const CustomTooltip = ({ active, payload, label }) => {
   return (
     <div style={{ background: C.ink, borderRadius: 8, padding: '8px 12px', fontSize: 12 }}>
       <div style={{ color: C.hintOnDark, marginBottom: 4 }}>{label}</div>
-      <div style={{ color: C.gold, fontWeight: 700 }}>GHS {payload[0]?.value}</div>
-      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>Target: GHS {payload[0]?.payload?.target}</div>
+      {payload.map((p, i) => (
+        <div key={i} style={{ color: p.color, fontWeight: 700 }}>{p.name}: GHS {p.value}</div>
+      ))}
     </div>
   );
 };
@@ -45,25 +46,21 @@ export default function CircleAnalytics({ circle }) {
       {/* Bar chart */}
       <div style={{ padding: '12px 4px 0' }}>
         <div style={{ fontSize: 11, color: C.muted, paddingLeft: 10, marginBottom: 6, fontWeight: 600 }}>CONTRIBUTIONS PER CYCLE (GHS)</div>
-        <ResponsiveContainer width="100%" height={140}>
-          <BarChart data={CYCLE_DATA} barSize={28} margin={{ top: 4, right: 10, left: -20, bottom: 0 }}>
+        <ResponsiveContainer width="100%" height={160}>
+          <BarChart data={CYCLE_DATA} barGap={4} barCategoryGap="30%" margin={{ top: 4, right: 10, left: -20, bottom: 0 }}>
             <XAxis dataKey="cycle" tick={{ fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 10, fill: C.muted }} axisLine={false} tickLine={false} />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-            <ReferenceLine y={cycleTarget} stroke={C.gold} strokeDasharray="4 3" strokeWidth={1.5} />
-            <Bar dataKey="collected" radius={[5, 5, 0, 0]}>
+            <Legend iconType="square" iconSize={9} wrapperStyle={{ fontSize: 10, paddingTop: 4, paddingLeft: 10 }}
+              formatter={(value) => <span style={{ color: C.muted }}>{value}</span>} />
+            <Bar dataKey="target" name="Target" fill={C.border} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="collected" name="Collected" radius={[4, 4, 0, 0]}>
               {CYCLE_DATA.map((entry, i) => (
                 <Cell key={i} fill={entry.collected >= entry.target ? C.green : i === CYCLE_DATA.length - 1 ? C.gold : C.amber} />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 10, paddingBottom: 4, marginTop: -4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 20, height: 2, background: C.gold, borderRadius: 1 }} />
-            <span style={{ fontSize: 10, color: C.muted }}>Target GHS {cycleTarget}</span>
-          </div>
-        </div>
       </div>
 
       <div style={{ height: 1, background: C.border, margin: '8px 14px' }} />
