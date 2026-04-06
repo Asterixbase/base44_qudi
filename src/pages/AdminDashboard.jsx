@@ -5,7 +5,7 @@ import AdminRevenueChart from '@/components/AdminRevenueChart';
 import AdminTopProducts from '@/components/AdminTopProducts';
 import AdminStockTurnover from '@/components/AdminStockTurnover';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Download } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -22,81 +22,32 @@ export default function AdminDashboard() {
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
+  const exportData = async (type) => {
     try {
-      setLoading(true);
-      const [transactions, products, stock] = await Promise.all([
-        base44.entities.Transaction.list('-created_date', 500),
-        base44.entities.Product.list(),
-        base44.entities.Stock.list(),
-      ]);
-
-      // Process daily revenue data (last 30 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const revenueMap = {};
-      transactions
-        .filter(tx => {
-          const txDate = new Date(tx.created_date);
-          return tx.type === 'out' && txDate >= thirtyDaysAgo;
-        })
-        .forEach(tx => {
-          const date = new Date(tx.created_date).toLocaleDateString('en-GB');
-          const product = products.find(p => p.id === tx.product_id);
-          const amount = (product?.unit_price || 0) * tx.quantity;
-          revenueMap[date] = (revenueMap[date] || 0) + amount;
-        });
-
-      const revenueChartData = Object.entries(revenueMap)
-        .map(([date, revenue]) => ({ date, revenue }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      setRevenueData(revenueChartData);
-
-      // Process top products
-      const productSalesMap = {};
-      transactions
-        .filter(tx => {
-          const txDate = new Date(tx.created_date);
-          return tx.type === 'out' && txDate >= thirtyDaysAgo;
-        })
-        .forEach(tx => {
-          productSalesMap[tx.product_id] = (productSalesMap[tx.product_id] || 0) + tx.quantity;
-        });
-
-      const topProductsList = Object.entries(productSalesMap)
-        .map(([productId, quantity]) => {
-          const product = products.find(p => p.id === productId);
-          return {
-            id: productId,
-            name: product?.name || 'Unknown',
-            quantity,
-          };
-        })
-        .sort((a, b) => b.quantity - a.quantity)
-        .slice(0, 10);
-
-      setTopProducts(topProductsList);
-
-      // Calculate stock turnover metrics
-      const totalUnitsSold = Object.values(productSalesMap).reduce((sum, qty) => sum + qty, 0);
-      const avgStockLevel = stock.length > 0 
-        ? stock.reduce((sum, s) => sum + s.quantity, 0) / stock.length 
-        : 0;
-      const turnoverRatio = avgStockLevel > 0 ? totalUnitsSold / avgStockLevel : 0;
-
-      setStockMetrics({
-        totalUnitsSold,
-        avgStockLevel,
-        turnoverRatio,
+      const functionName = type === 'transactions' ? 'exportTransactions' : 'exportInventory';
+      const response = await fetch(`/api/functions/${functionName}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
       });
+
+      if (!response.ok) throw new Error('Export failed');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${type}_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-    } finally {
-      setLoading(false);
+      console.error('Export failed:', error);
+      alert('Export failed. Please try again.');
     }
   };
+
+  const loadDashboardData = async () => {
 
   if (loading) {
     return (
@@ -130,6 +81,26 @@ export default function AdminDashboard() {
         <p className="text-sm text-primary-light ml-12">Revenue, products & inventory insights</p>
       </div>
 
+      {/* Export Controls */}
+      <div className="px-4 pt-4 pb-0">
+        <div className="flex gap-2">
+          <button
+            onClick={() => exportData('transactions')}
+            className="flex-1 bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary-light transition flex items-center justify-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export Transactions
+          </button>
+          <button
+            onClick={() => exportData('inventory')}
+            className="flex-1 bg-accent text-white py-2 rounded-lg font-medium hover:bg-accent-light transition flex items-center justify-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Export Inventory
+          </button>
+        </div>
+      </div>
+
       {/* Content */}
       <div className="p-4 space-y-6">
         <AdminRevenueChart data={revenueData} />
@@ -138,4 +109,7 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+}
+
+export default AdminDashboard;
 }
