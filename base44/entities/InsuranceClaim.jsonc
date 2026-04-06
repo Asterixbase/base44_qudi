@@ -1,0 +1,78 @@
+{
+  "name": "InsuranceClaim",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "circle_name": {
+      "type": "string",
+      "title": "Circle Name"
+    },
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "claim_type": {
+      "type": "string",
+      "enum": [
+        "missed_payout",
+        "member_default",
+        "fraud",
+        "death_hardship",
+        "other"
+      ],
+      "title": "Claim Type"
+    },
+    "amount_claimed": {
+      "type": "number",
+      "title": "Amount Claimed (GHS)"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "evidence_url": {
+      "type": "string",
+      "title": "Evidence File URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "under_review",
+        "approved",
+        "rejected",
+        "paid_out"
+      ],
+      "title": "Status"
+    },
+    "claim_ref": {
+      "type": "string",
+      "title": "Claim Reference"
+    },
+    "insurer_note": {
+      "type": "string",
+      "title": "Insurer Note"
+    },
+    "payout_amount": {
+      "type": "number",
+      "title": "Approved Payout (GHS)"
+    },
+    "cycle": {
+      "type": "number",
+      "title": "Cycle Number"
+    }
+  },
+  "required": [
+    "circle_id",
+    "circle_name",
+    "claim_type",
+    "status"
+  ]
+}

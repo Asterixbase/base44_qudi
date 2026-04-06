@@ -85,7 +85,7 @@ export default function Dashboard() {
           {[
             { label: 'Collect', path: '/collect-dues' },
             { label: 'Payouts', path: '/payout-distribution' },
-            { label: 'Invites', path: '/invitations' },
+            { label: 'Insurance', path: '/insurance' },
             { label: 'Disputes', path: '/disputes' },
           ].map(({ label, path }) => (
             <Link key={label} to={path} style={{
