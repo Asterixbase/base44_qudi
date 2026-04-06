@@ -7,6 +7,7 @@ import Avatar from '../components/qudi/Avatar';
 import TrustBadge from '../components/qudi/TrustBadge';
 import FraudAlert from '../components/qudi/FraudAlert';
 import CircleAnalytics from '../components/qudi/CircleAnalytics';
+import ReminderButton from '../components/qudi/ReminderButton';
 import NavBar from '../components/qudi/NavBar';
 
 const DEMO_MEMBERS = [
@@ -104,6 +105,9 @@ export default function CircleDetail() {
             borderRadius: 10, padding: '12px', fontWeight: 700, fontSize: 13, cursor: 'pointer',
           }}>Insure</button>
         </div>
+
+        {/* Reminders */}
+        <ReminderButton members={DEMO_MEMBERS} circle={circle} />
 
         {/* Analytics */}
         <CircleAnalytics circle={circle} />

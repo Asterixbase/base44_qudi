@@ -1,0 +1,48 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "message": {
+      "type": "string",
+      "title": "Message Sent"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "failed"
+      ],
+      "title": "Status"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "sms",
+        "in-app"
+      ],
+      "title": "Channel"
+    }
+  },
+  "required": [
+    "circle_id",
+    "member_name",
+    "message",
+    "status"
+  ]
+}
