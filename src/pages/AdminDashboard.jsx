@@ -5,6 +5,7 @@ import { C } from '../lib/qudiTokens';
 import Header from '../components/qudi/Header';
 import KenteStripe from '../components/qudi/KenteStripe';
 import NavBar from '../components/qudi/NavBar';
+import { Link } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, Legend,
@@ -103,6 +104,15 @@ export default function AdminDashboard() {
           <div style={{ textAlign: 'center', paddingTop: 60, color: C.muted }}>Loading data…</div>
         ) : (
           <>
+            {/* Quick Actions */}
+            <Link to="/reconciliation" style={
+              { display: 'block', textDecoration: 'none', background: C.ink, color: C.gold,
+                borderRadius: 12, padding: '13px 16px', marginBottom: 14,
+                fontWeight: 700, fontSize: 14, textAlign: 'center' }
+            }>
+              🔄 Run MoMo Reconciliation
+            </Link>
+
             {/* Stat cards */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
               {statCards.map(({ label, value, sub, color }) => (

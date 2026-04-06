@@ -24,6 +24,7 @@ import InviteSystem from './pages/InviteSystem';
 import PayoutDistribution from './pages/PayoutDistribution';
 import InsuranceManagement from './pages/InsuranceManagement';
 import AutoPenaltyScanner from './pages/AutoPenaltyScanner';
+import ReconciliationPage from './pages/ReconciliationPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -69,6 +70,7 @@ const AuthenticatedApp = () => {
       <Route path="/payout-distribution" element={<PayoutDistribution />} />
       <Route path="/insurance" element={<InsuranceManagement />} />
       <Route path="/auto-penalties" element={<AutoPenaltyScanner />} />
+      <Route path="/reconciliation" element={<ReconciliationPage />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
