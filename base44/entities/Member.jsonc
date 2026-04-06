@@ -1,0 +1,69 @@
+{
+  "name": "Member",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "user_id": {
+      "type": "string",
+      "title": "User ID"
+    },
+    "full_name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "phone": {
+      "type": "string",
+      "title": "MoMo Phone Number"
+    },
+    "initials": {
+      "type": "string",
+      "title": "Initials"
+    },
+    "payout_position": {
+      "type": "number",
+      "title": "Payout Position"
+    },
+    "trust_score": {
+      "type": "number",
+      "title": "Trust Score (0-100)"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "paid",
+        "pending",
+        "failed",
+        "overdue"
+      ],
+      "title": "Payment Status"
+    },
+    "is_verified": {
+      "type": "boolean",
+      "title": "KYC Verified"
+    },
+    "is_organiser": {
+      "type": "boolean",
+      "title": "Is Organiser"
+    },
+    "has_received_payout": {
+      "type": "boolean",
+      "title": "Has Received Payout"
+    },
+    "guarantor_name": {
+      "type": "string",
+      "title": "Guarantor Name"
+    },
+    "joined_cycles_ago": {
+      "type": "number",
+      "title": "Joined Cycles Ago"
+    }
+  },
+  "required": [
+    "circle_id",
+    "full_name",
+    "phone"
+  ]
+}

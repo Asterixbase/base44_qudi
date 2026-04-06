@@ -1,0 +1,59 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "member_id": {
+      "type": "string",
+      "title": "Member ID"
+    },
+    "member_name": {
+      "type": "string",
+      "title": "Member Name"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "collection",
+        "payout",
+        "insurance",
+        "guarantor_charge"
+      ],
+      "title": "Type"
+    },
+    "amount": {
+      "type": "number",
+      "title": "Amount (GHS)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "pending",
+        "failed"
+      ],
+      "title": "Status"
+    },
+    "momo_ref": {
+      "type": "string",
+      "title": "MoMo Reference"
+    },
+    "cycle": {
+      "type": "number",
+      "title": "Cycle Number"
+    },
+    "note": {
+      "type": "string",
+      "title": "Note"
+    }
+  },
+  "required": [
+    "circle_id",
+    "type",
+    "amount",
+    "status"
+  ]
+}

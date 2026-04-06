@@ -1,0 +1,80 @@
+{
+  "name": "Circle",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Circle Name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "contribution_amount": {
+      "type": "number",
+      "title": "Contribution Amount (GHS)"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "weekly",
+        "monthly"
+      ],
+      "title": "Frequency"
+    },
+    "max_members": {
+      "type": "number",
+      "title": "Max Members"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "forming",
+        "active",
+        "completed"
+      ],
+      "title": "Status"
+    },
+    "current_cycle": {
+      "type": "number",
+      "title": "Current Cycle"
+    },
+    "payout_order": {
+      "type": "string",
+      "enum": [
+        "random",
+        "fixed",
+        "rotation",
+        "bid"
+      ],
+      "title": "Payout Order"
+    },
+    "guarantor_policy": {
+      "type": "string",
+      "enum": [
+        "required",
+        "optional",
+        "none"
+      ],
+      "title": "Guarantor Policy"
+    },
+    "pot_balance": {
+      "type": "number",
+      "title": "Pot Balance (GHS)"
+    },
+    "organiser_id": {
+      "type": "string",
+      "title": "Organiser User ID"
+    },
+    "is_insured": {
+      "type": "boolean",
+      "title": "Insured"
+    }
+  },
+  "required": [
+    "name",
+    "contribution_amount",
+    "frequency",
+    "max_members"
+  ]
+}

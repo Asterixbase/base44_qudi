@@ -5,6 +5,12 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import Splash from './pages/Splash';
+import Registration from './pages/Registration';
+import Dashboard from './pages/Dashboard';
+import CircleDetail from './pages/CircleDetail';
+import CollectDues from './pages/CollectDues';
+import SendPayout from './pages/SendPayout';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -33,7 +39,12 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Splash />} />
+      <Route path="/register" element={<Registration />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/circle-detail" element={<CircleDetail />} />
+      <Route path="/collect-dues" element={<CollectDues />} />
+      <Route path="/send-payout" element={<SendPayout />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
