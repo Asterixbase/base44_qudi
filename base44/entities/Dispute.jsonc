@@ -14,6 +14,15 @@
       "type": "string",
       "title": "Member Name"
     },
+    "dispute_type": {
+      "type": "string",
+      "enum": [
+        "payment_status",
+        "suspicious_transaction",
+        "missed_payout"
+      ],
+      "title": "Dispute Type"
+    },
     "reported_status": {
       "type": "string",
       "title": "Incorrectly Reported Status"
@@ -28,6 +37,14 @@
       ],
       "title": "Member's Claimed Status"
     },
+    "transaction_ref": {
+      "type": "string",
+      "title": "Suspicious Transaction Ref / MoMo Ref"
+    },
+    "flagged_amount": {
+      "type": "number",
+      "title": "Flagged Amount (GHS)"
+    },
     "description": {
       "type": "string",
       "title": "Description"
@@ -41,10 +58,19 @@
       "enum": [
         "open",
         "under_review",
+        "escrow_held",
         "resolved",
         "rejected"
       ],
       "title": "Dispute Status"
+    },
+    "escrow_held": {
+      "type": "boolean",
+      "title": "Funds in Escrow"
+    },
+    "escrow_amount": {
+      "type": "number",
+      "title": "Escrowed Amount (GHS)"
     },
     "organiser_note": {
       "type": "string",
@@ -53,13 +79,16 @@
     "cycle": {
       "type": "number",
       "title": "Cycle Number"
+    },
+    "resolution": {
+      "type": "string",
+      "title": "Resolution Action"
     }
   },
   "required": [
     "circle_id",
     "member_name",
-    "reported_status",
-    "claimed_status",
+    "dispute_type",
     "status"
   ]
 }
