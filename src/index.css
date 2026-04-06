@@ -6,15 +6,15 @@
 
 @layer base {
   :root {
-    --primary: 219 89% 52%;
-    --primary-light: 219 89% 62%;
-    --accent: 185 100% 49%;
-    --accent-light: 185 100% 59%;
-    --background: 217 33% 6%;
-    --foreground: 215 19% 97%;
-    --card: 217 33% 11%;
-    --muted: 217 12% 30%;
-    --border: 217 20% 20%;
+    --primary: 42 84% 51%;
+    --primary-light: 48 89% 63%;
+    --accent: 142 71% 45%;
+    --accent-light: 142 71% 55%;
+    --background: 48 100% 97%;
+    --foreground: 20 50% 12%;
+    --card: 0 0% 100%;
+    --muted: 0 0% 87%;
+    --border: 0 0% 92%;
     --destructive: 0 84% 60%;
   }
 }
