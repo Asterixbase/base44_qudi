@@ -1,0 +1,52 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "sku": {
+      "type": "string",
+      "title": "SKU / Product Code"
+    },
+    "name": {
+      "type": "string",
+      "title": "Product Name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "barcode": {
+      "type": "string",
+      "title": "Barcode"
+    },
+    "unit_price": {
+      "type": "number",
+      "title": "Unit Price (GHS)"
+    },
+    "reorder_level": {
+      "type": "number",
+      "title": "Reorder Level"
+    },
+    "category": {
+      "type": "string",
+      "title": "Category"
+    },
+    "supplier": {
+      "type": "string",
+      "title": "Supplier Name"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "discontinued"
+      ],
+      "title": "Status"
+    }
+  },
+  "required": [
+    "sku",
+    "name",
+    "unit_price"
+  ]
+}

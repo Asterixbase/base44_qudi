@@ -1,0 +1,51 @@
+{
+  "name": "Stock",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "title": "Product ID"
+    },
+    "product_sku": {
+      "type": "string",
+      "title": "Product SKU"
+    },
+    "product_name": {
+      "type": "string",
+      "title": "Product Name"
+    },
+    "quantity": {
+      "type": "number",
+      "title": "Current Quantity"
+    },
+    "location": {
+      "type": "string",
+      "title": "Storage Location"
+    },
+    "last_counted": {
+      "type": "string",
+      "title": "Last Counted (ISO Date)"
+    },
+    "expiry_date": {
+      "type": "string",
+      "title": "Expiry Date (ISO Date)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "in_stock",
+        "low_stock",
+        "out_of_stock",
+        "expired"
+      ],
+      "title": "Status"
+    }
+  },
+  "required": [
+    "product_id",
+    "product_sku",
+    "product_name",
+    "quantity",
+    "location"
+  ]
+}

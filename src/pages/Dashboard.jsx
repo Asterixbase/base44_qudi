@@ -1,167 +1,164 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import useReminderScheduler from '../hooks/useReminderScheduler';
+import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { C } from '../lib/qudiTokens';
-import KenteStripe from '../components/qudi/KenteStripe';
-import NavBar from '../components/qudi/NavBar';
-import Avatar from '../components/qudi/Avatar';
-
-const DEMO_CIRCLES = [
-  { id: 'c1', name: 'Kantamanto Traders', meta: 'Cycle 3 · Monthly · 10 members', amount: 'GHS 1,400', status: 'active', progress: 70, initials: 'KT', isInsured: true },
-  { id: 'c2', name: 'Madina Women Circle', meta: 'Forming · Weekly · 3/5 joined', amount: '2 spots left', status: 'forming', progress: 60, initials: 'MW', isInsured: false },
-];
+import { offlineSync } from '@/lib/offlineSync';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [circles, setCircles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const reminderSummary = useReminderScheduler(); // auto-fires due reminders silently
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    lowStock: 0,
+    outOfStock: 0,
+    pendingSync: 0,
+  });
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    base44.entities.Circle.list('-created_date', 10)
-      .then(data => setCircles(data.length ? data : DEMO_CIRCLES))
-      .catch(() => setCircles(DEMO_CIRCLES))
-      .finally(() => setLoading(false));
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    loadStats();
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
-  const statusStyle = (s) => s === 'active'
-    ? { bg: '#D4EDDA', color: '#155724', label: 'ACTIVE' }
-    : s === 'forming'
-    ? { bg: '#E3F0FF', color: '#2D6FA8', label: 'FORMING' }
-    : { bg: '#EDE6D6', color: '#6B5A3A', label: 'COMPLETED' };
+  const loadStats = async () => {
+    try {
+      const products = await base44.entities.Product.list();
+      const stock = await base44.entities.Stock.list();
+      const queue = offlineSync.getQueue();
+
+      const lowStock = stock.filter(s => s.status === 'low_stock').length;
+      const outOfStock = stock.filter(s => s.status === 'out_of_stock').length;
+
+      setStats({
+        totalProducts: products.length,
+        lowStock,
+        outOfStock,
+        pendingSync: queue.filter(q => !q.synced).length,
+      });
+
+      offlineSync.cacheProducts(products);
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    }
+  };
+
+  const handleSync = async () => {
+    const queue = offlineSync.getQueue();
+    if (queue.length === 0) return;
+
+    try {
+      for (const item of queue) {
+        if (item.type === 'transaction') {
+          await base44.entities.Transaction.create(item);
+        }
+      }
+      offlineSync.clearQueue();
+      loadStats();
+    } catch (error) {
+      console.error('Sync failed:', error);
+    }
+  };
 
   return (
-    <div style={{ minHeight: '100dvh', background: C.cream, maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
-      {/* Top bar */}
-      <div style={{ background: C.ink, padding: '16px 16px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 8, background: C.gold,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 900, color: C.ink, fontSize: 16,
-            }}>Q</div>
-            <span style={{ color: C.cream, fontWeight: 700, fontSize: 16 }}>Qudi</span>
-          </div>
-          <button onClick={() => navigate('/dashboard')} style={{
-            width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.1)',
-            border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', color: C.cream, fontSize: 18, position: 'relative',
-          }}>
-            🔔
-            <span style={{
-              position: 'absolute', top: 6, right: 6, width: 8, height: 8,
-              borderRadius: '50%', background: C.red,
-            }} />
-          </button>
-        </div>
-
-        {/* Hero card */}
-        <div style={{
-          background: 'rgba(255,255,255,0.06)', borderRadius: '14px 14px 0 0',
-          padding: '18px 16px 20px', border: `0.5px solid rgba(235,160,32,0.3)`,
-        }}>
-          <div style={{ color: C.hintOnDark, fontSize: 13 }}>Good morning,</div>
-          <div style={{ color: C.cream, fontWeight: 700, fontSize: 20, marginTop: 2 }}>Akosua Asante</div>
-          <div style={{ color: C.hintOnDark, fontSize: 12, marginTop: 2, marginBottom: 16 }}>Total across circles</div>
-          <div style={{ color: C.gold, fontSize: 32, fontWeight: 800, letterSpacing: -0.5 }}>GHS 3,400</div>
-          <div style={{ color: C.hintOnDark, fontSize: 12, marginTop: 4, marginBottom: 16 }}>2 active circles · 15 members</div>
-          <div style={{ display: 'flex', gap: 20 }}>
-            {[{ v: '3', l: 'Circles' }, { v: '85%', l: 'Paid on time' }].map(m => (
-              <div key={m.l}>
-                <div style={{ color: C.cream, fontWeight: 700, fontSize: 18 }}>{m.v}</div>
-                <div style={{ color: C.hintOnDark, fontSize: 12 }}>{m.l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <KenteStripe height={4} />
+    <div className="min-h-screen bg-background pb-20">
+      {/* Header */}
+      <div className="bg-primary text-white p-4 sticky top-0 z-50">
+        <h1 className="text-2xl font-bold">Sikasem</h1>
+        <p className="text-sm text-primary-light opacity-80">{isOnline ? '🟢 Online' : '🔴 Offline'}</p>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 70 }}>
-        {/* Quick actions */}
-        <div style={{ display: 'flex', gap: 0, padding: '12px 16px', borderBottom: `1px solid ${C.border}` }}>
-          {[
-            { label: 'Collect', path: '/collect-dues' },
-            { label: 'Payouts', path: '/payout-distribution' },
-            { label: 'Insurance', path: '/insurance' },
-            { label: 'Disputes', path: '/disputes' },
-          ].map(({ label, path }) => (
-            <Link key={label} to={path} style={{
-              flex: 1, textAlign: 'center', padding: '10px 4px', fontSize: 13,
-              fontWeight: 600, color: C.goldText, textDecoration: 'none',
-              borderRight: `1px solid ${C.border}`,
-            }}>{label}</Link>
-          ))}
-        </div>
-
-        {/* Circles */}
-        <div style={{ padding: '16px 16px 0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontWeight: 700, fontSize: 15, color: C.ink }}>Your circles</div>
-            <span style={{ color: C.goldText, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>See all</span>
-          </div>
-
-          {loading ? (
-            [1,2].map(i => (
-              <div key={i} style={{ background: C.white, borderRadius: 12, padding: 16, marginBottom: 8, height: 80, animation: 'pulse 1.5s infinite' }} />
-            ))
-          ) : circles.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '32px 20px', color: C.muted }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>◎</div>
-              <div style={{ fontWeight: 600, color: C.ink, marginBottom: 6 }}>No circles yet</div>
-              <div style={{ fontSize: 13 }}>Create or join a circle to get started</div>
-            </div>
-          ) : (
-            circles.map((circle) => {
-              const s = statusStyle(circle.status);
-              return (
-                <div key={circle.id} onClick={() => navigate('/circle-detail', { state: { circle } })} style={{
-                  background: C.white, borderRadius: 12, padding: '12px 14px',
-                  marginBottom: 8, border: `0.5px solid ${C.border}`, cursor: 'pointer',
-                  position: 'relative', overflow: 'hidden',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <Avatar initials={circle.initials || (circle.name || '').slice(0,2).toUpperCase()} size={40} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: C.ink }}>{circle.name}</div>
-                      <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{circle.meta || `${circle.frequency || 'monthly'} · ${circle.max_members || '?'} members`}</div>
-                      <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
-                        <span style={{ background: s.bg, color: s.color, borderRadius: 4, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>{s.label}</span>
-                        {(circle.is_insured || circle.isInsured) && (
-                          <span style={{ background: C.tealBg, color: C.tealTx, borderRadius: 4, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>Insured</span>
-                        )}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: C.goldText }}>{circle.amount || `GHS ${circle.contribution_amount || '—'}`}</div>
-                    </div>
-                  </div>
-                  {/* Progress bar */}
-                  <div style={{ height: 3, background: C.border, borderRadius: 2, marginTop: 10, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', background: C.gold, width: `${circle.progress || 50}%`, borderRadius: 2 }} />
-                  </div>
-                </div>
-              );
-            })
+      {/* Sync Alert */}
+      {stats.pendingSync > 0 && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 m-4">
+          <p className="text-sm font-semibold text-yellow-800">
+            {stats.pendingSync} pending sync
+          </p>
+          {isOnline && (
+            <button
+              onClick={handleSync}
+              className="mt-2 px-4 py-2 bg-yellow-600 text-white rounded-md text-sm font-medium hover:bg-yellow-700"
+            >
+              Sync Now
+            </button>
           )}
-
-          {/* Create circle CTA */}
-          <div onClick={() => navigate('/dashboard')} style={{
-            background: C.white, borderRadius: 12, padding: '16px', marginBottom: 8,
-            border: `1.5px dashed ${C.gold}`, cursor: 'pointer', display: 'flex',
-            alignItems: 'center', gap: 12, justifyContent: 'center',
-          }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#FFF3D6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.goldText, fontWeight: 700, fontSize: 20 }}>+</div>
-            <span style={{ fontWeight: 600, color: C.ink, fontSize: 14 }}>Create new circle</span>
-          </div>
         </div>
+      )}
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-4 p-4">
+        <StatCard
+          label="Total Products"
+          value={stats.totalProducts}
+          icon="📦"
+          onClick={() => navigate('/stock')}
+        />
+        <StatCard
+          label="Low Stock"
+          value={stats.lowStock}
+          icon="⚠️"
+          highlight={stats.lowStock > 0}
+          onClick={() => navigate('/stock')}
+        />
+        <StatCard
+          label="Out of Stock"
+          value={stats.outOfStock}
+          icon="❌"
+          highlight={stats.outOfStock > 0}
+          onClick={() => navigate('/stock')}
+        />
+        <StatCard
+          label="Pending Sync"
+          value={stats.pendingSync}
+          icon="🔄"
+          highlight={stats.pendingSync > 0}
+        />
       </div>
 
-      <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 430 }}>
-        <NavBar />
+      {/* Quick Actions */}
+      <div className="p-4 space-y-2">
+        <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wider">Quick Actions</h2>
+        <QuickActionButton label="Scan Barcode" icon="📱" onClick={() => navigate('/scan')} />
+        <QuickActionButton label="Check Stock" icon="📊" onClick={() => navigate('/stock')} />
+        <QuickActionButton label="Reports" icon="📈" onClick={() => navigate('/reports')} />
+        <QuickActionButton label="Settings" icon="⚙️" onClick={() => navigate('/settings')} />
       </div>
     </div>
+  );
+}
+
+function StatCard({ label, value, icon, highlight, onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      className={`p-4 rounded-lg cursor-pointer transition ${
+        highlight
+          ? 'bg-destructive/10 border border-destructive/30'
+          : 'bg-card border border-border'
+      }`}
+    >
+      <div className="text-3xl mb-2">{icon}</div>
+      <p className="text-xs text-foreground/60 uppercase tracking-wide">{label}</p>
+      <p className="text-2xl font-bold text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function QuickActionButton({ label, icon, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full bg-primary text-white font-medium py-3 rounded-lg flex items-center gap-3 hover:bg-primary-light transition"
+    >
+      <span className="text-xl">{icon}</span>
+      {label}
+    </button>
   );
 }

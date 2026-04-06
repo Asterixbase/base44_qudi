@@ -2,58 +2,49 @@
   "name": "Transaction",
   "type": "object",
   "properties": {
-    "circle_id": {
+    "product_id": {
       "type": "string",
-      "title": "Circle ID"
+      "title": "Product ID"
     },
-    "member_id": {
+    "product_name": {
       "type": "string",
-      "title": "Member ID"
-    },
-    "member_name": {
-      "type": "string",
-      "title": "Member Name"
+      "title": "Product Name"
     },
     "type": {
       "type": "string",
       "enum": [
-        "collection",
-        "payout",
-        "insurance",
-        "guarantor_charge"
+        "in",
+        "out",
+        "adjustment",
+        "damage"
       ],
-      "title": "Type"
+      "title": "Transaction Type"
     },
-    "amount": {
+    "quantity": {
       "type": "number",
-      "title": "Amount (GHS)"
+      "title": "Quantity"
     },
-    "status": {
+    "reference": {
+      "type": "string",
+      "title": "Reference (PO/Sales Ref)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    },
+    "sync_status": {
       "type": "string",
       "enum": [
-        "success",
         "pending",
-        "failed"
+        "synced"
       ],
-      "title": "Status"
-    },
-    "momo_ref": {
-      "type": "string",
-      "title": "MoMo Reference"
-    },
-    "cycle": {
-      "type": "number",
-      "title": "Cycle Number"
-    },
-    "note": {
-      "type": "string",
-      "title": "Note"
+      "title": "Sync Status"
     }
   },
   "required": [
-    "circle_id",
+    "product_id",
+    "product_name",
     "type",
-    "amount",
-    "status"
+    "quantity"
   ]
 }

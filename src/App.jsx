@@ -6,39 +6,15 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Splash from './pages/Splash';
-import Registration from './pages/Registration';
 import Dashboard from './pages/Dashboard';
-import CircleDetail from './pages/CircleDetail';
-import CollectDues from './pages/CollectDues';
-import SendPayout from './pages/SendPayout';
-// Add page imports here
-import DisputeDashboard from './pages/DisputeDashboard';
-import ReminderSchedule from './pages/ReminderSchedule';
-import PenaltySettings from './pages/PenaltySettings';
-import PayoutScheduler from './pages/PayoutScheduler';
-import ReferralHub from './pages/ReferralHub';
-import MyPayouts from './pages/MyPayouts';
-import PenaltyLedgerPage from './pages/PenaltyLedgerPage';
-import AdminDashboard from './pages/AdminDashboard';
-import InviteSystem from './pages/InviteSystem';
-import PayoutDistribution from './pages/PayoutDistribution';
-import InsuranceManagement from './pages/InsuranceManagement';
-import AutoPenaltyScanner from './pages/AutoPenaltyScanner';
-import ReconciliationPage from './pages/ReconciliationPage';
-import PayoutRoadmap from './pages/PayoutRoadmap';
-import MemberContributionHistory from './pages/MemberContributionHistory';
-import CashFlowForecast from './pages/CashFlowForecast';
-import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
-import MemberProfile from './pages/MemberProfile';
-import CollectionMonitor from './pages/CollectionMonitor';
-import GuarantorHealth from './pages/GuarantorHealth';
-import CrossBorderPayouts from './pages/CrossBorderPayouts';
-import ArchitectureOverview from './pages/ArchitectureOverview';
+import Scanner from './pages/Scanner';
+import Stock from './pages/Stock';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -47,56 +23,29 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
       navigateToLogin();
       return null;
     }
   }
 
-  // Render the main app
   return (
     <Routes>
       <Route path="/" element={<Splash />} />
-      <Route path="/register" element={<Registration />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/circle-detail" element={<CircleDetail />} />
-      <Route path="/collect-dues" element={<CollectDues />} />
-      <Route path="/send-payout" element={<SendPayout />} />
-      <Route path="/disputes" element={<DisputeDashboard />} />
-      <Route path="/reminders" element={<ReminderSchedule />} />
-      <Route path="/penalty-settings" element={<PenaltySettings />} />
-      <Route path="/payout-scheduler" element={<PayoutScheduler />} />
-      <Route path="/referrals" element={<ReferralHub />} />
-      <Route path="/my-payouts" element={<MyPayouts />} />
-      <Route path="/penalty-ledger" element={<PenaltyLedgerPage />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/invitations" element={<InviteSystem />} />
-      <Route path="/payout-distribution" element={<PayoutDistribution />} />
-      <Route path="/insurance" element={<InsuranceManagement />} />
-      <Route path="/auto-penalties" element={<AutoPenaltyScanner />} />
-      <Route path="/reconciliation" element={<ReconciliationPage />} />
-      <Route path="/payout-roadmap" element={<PayoutRoadmap />} />
-      <Route path="/member-history" element={<MemberContributionHistory />} />
-      <Route path="/cash-flow-forecast" element={<CashFlowForecast />} />
-      <Route path="/smart-payout" element={<SmartPayoutScheduler />} />
-      <Route path="/member-profile" element={<MemberProfile />} />
-      <Route path="/collection-monitor" element={<CollectionMonitor />} />
-      <Route path="/guarantor-health" element={<GuarantorHealth />} />
-      <Route path="/cross-border" element={<CrossBorderPayouts />} />
-      <Route path="/architecture" element={<ArchitectureOverview />} />
+      <Route path="/scan" element={<Scanner />} />
+      <Route path="/stock" element={<Stock />} />
+      <Route path="/reports" element={<Reports />} />
+      <Route path="/settings" element={<Settings />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };
 
-
 function App() {
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>

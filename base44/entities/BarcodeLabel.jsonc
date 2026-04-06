@@ -1,0 +1,46 @@
+{
+  "name": "BarcodeLabel",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "title": "Product ID"
+    },
+    "barcode_value": {
+      "type": "string",
+      "title": "Barcode Value"
+    },
+    "product_sku": {
+      "type": "string",
+      "title": "Product SKU"
+    },
+    "product_name": {
+      "type": "string",
+      "title": "Product Name"
+    },
+    "unit_price": {
+      "type": "number",
+      "title": "Unit Price (GHS)"
+    },
+    "label_type": {
+      "type": "string",
+      "enum": [
+        "ean13",
+        "ean8",
+        "qr",
+        "code128",
+        "custom"
+      ],
+      "title": "Label Type"
+    },
+    "generated_date": {
+      "type": "string",
+      "title": "Generated Date (ISO)"
+    }
+  },
+  "required": [
+    "product_id",
+    "barcode_value",
+    "product_sku"
+  ]
+}
