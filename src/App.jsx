@@ -13,6 +13,7 @@ import CollectDues from './pages/CollectDues';
 import SendPayout from './pages/SendPayout';
 // Add page imports here
 import DisputeDashboard from './pages/DisputeDashboard';
+import ReminderSchedule from './pages/ReminderSchedule';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -47,6 +48,7 @@ const AuthenticatedApp = () => {
       <Route path="/collect-dues" element={<CollectDues />} />
       <Route path="/send-payout" element={<SendPayout />} />
       <Route path="/disputes" element={<DisputeDashboard />} />
+      <Route path="/reminders" element={<ReminderSchedule />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

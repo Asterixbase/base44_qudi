@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import useReminderScheduler from '../hooks/useReminderScheduler';
 import { base44 } from '@/api/base44Client';
 import { C } from '../lib/qudiTokens';
 import KenteStripe from '../components/qudi/KenteStripe';
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [circles, setCircles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const reminderSummary = useReminderScheduler(); // auto-fires due reminders silently
 
   useEffect(() => {
     base44.entities.Circle.list('-created_date', 10)

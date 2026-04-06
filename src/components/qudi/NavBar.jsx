@@ -3,11 +3,11 @@ import { C } from '../../lib/qudiTokens';
 import KenteStripe from './KenteStripe';
 
 const NAV_ITEMS = [
-  { label: 'Home',     icon: '⌂',  path: '/dashboard' },
-  { label: 'Circles',  icon: '◎',  path: '/circle-detail' },
-  { label: 'Disputes', icon: '🚩', path: '/disputes' },
-  { label: 'Insurance',icon: '🛡', path: '/dashboard' },
-  { label: 'More',     icon: '···',path: '/dashboard' },
+  { label: 'Home',      icon: '⌂',  path: '/dashboard' },
+  { label: 'Circles',   icon: '◎',  path: '/circle-detail' },
+  { label: 'Reminders', icon: '🔔', path: '/reminders' },
+  { label: 'Disputes',  icon: '🚩', path: '/disputes' },
+  { label: 'More',      icon: '···',path: '/dashboard' },
 ];
 
 export default function NavBar() {
