@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { barcodeParser } from '@/lib/barcodeParser';
@@ -9,13 +9,13 @@ import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 
 export default function Scanner() {
   const navigate = useNavigate();
-  const { videoRef, scanning, error, startScan, stopScan } = useScan();
   const [manualBarcode, setManualBarcode] = useState('');
   const [scannedData, setScannedData] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [transactionType, setTransactionType] = useState('in');
   const [loading, setLoading] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
+  const videoRef = useRef(null);
 
   const handleBarcodeScanned = (barcode) => {
     // Process scanned barcode
@@ -34,7 +34,9 @@ export default function Scanner() {
     setManualBarcode('');
   };
 
-  const queueTransaction = useOfflineStore((state) => state.queueTransaction);
+  const { queueTransaction } = useOfflineStore((state) => ({
+    queueTransaction: state.queueTransaction,
+  }));
 
   const handleSaveTransaction = async () => {
     if (!scannedData) return;
@@ -50,13 +52,15 @@ export default function Scanner() {
 
       if (navigator.onLine) {
         await base44.entities.Transaction.create(transaction);
+        setScannedData(null);
+        setQuantity(1);
+        alert('Transaction saved!');
       } else {
         queueTransaction(transaction);
+        setScannedData(null);
+        setQuantity(1);
+        alert('Saved offline. Will sync when online.');
       }
-
-      setScannedData(null);
-      setQuantity(1);
-      alert('Transaction saved!');
     } catch (err) {
       queueTransaction({
         barcode_value: scannedData.value,
@@ -64,7 +68,7 @@ export default function Scanner() {
         quantity: parseInt(quantity),
         timestamp: new Date().toISOString(),
       });
-      alert('Saved offline. Will sync when online.');
+      alert('Error saving transaction. Queued for later.');
     } finally {
       setLoading(false);
     }
@@ -74,6 +78,7 @@ export default function Scanner() {
     <div className="min-h-screen bg-background pb-24">
       {/* Offline Sync Banner */}
       <OfflineSyncBanner />
+      <video ref={videoRef} style={{ display: 'none' }} />
 
       {/* Header */}
       <div className="bg-primary text-white p-4 flex items-center gap-3">
@@ -93,6 +98,14 @@ export default function Scanner() {
             className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-light transition"
           >
             📷 Start Camera Scan
+          </button>
+        )}
+        {cameraActive && (
+          <button
+            onClick={() => setCameraActive(false)}
+            className="w-full mt-4 bg-destructive text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+          >
+            ✕ Close Camera
           </button>
         )}
       </div>
