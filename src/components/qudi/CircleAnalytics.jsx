@@ -53,7 +53,7 @@ export default function CircleAnalytics({ circle }) {
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
             <Legend iconType="square" iconSize={9} wrapperStyle={{ fontSize: 10, paddingTop: 4, paddingLeft: 10 }}
               formatter={(value) => <span style={{ color: C.muted }}>{value}</span>} />
-            <Bar dataKey="target" name="Target" fill="#C8C0A8" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="target" name="Target" fill="#6B5A3A" radius={[4, 4, 0, 0]} opacity={0.45} />
             <Bar dataKey="collected" name="Collected" radius={[4, 4, 0, 0]}>
               {CYCLE_DATA.map((entry, i) => (
                 <Cell key={i} fill={entry.collected >= entry.target ? C.green : i === CYCLE_DATA.length - 1 ? C.gold : C.amber} />
