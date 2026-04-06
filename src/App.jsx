@@ -14,6 +14,7 @@ import StockPredictions from './pages/StockPredictions';
 import ActivityFeed from './pages/ActivityFeed';
 import Scanner from './pages/Scanner';
 import Stock from './pages/Stock';
+import BarcodeInventoryScanner from './pages/BarcodeInventoryScanner';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import PurchaseOrders from './pages/PurchaseOrders';
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
       <Route path="/activity" element={<ActivityFeed />} />
       <Route path="/scan" element={<Scanner />} />
       <Route path="/stock" element={<Stock />} />
+      <Route path="/scan-inventory" element={<BarcodeInventoryScanner />} />
       <Route path="/reports" element={<Reports />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/purchase-orders" element={<PurchaseOrders />} />
