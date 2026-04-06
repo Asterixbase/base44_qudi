@@ -6,9 +6,14 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Splash from './pages/Splash';
-import Dashboard from './pages/Dashboard';
-import MetricsDashboard from './pages/MetricsDashboard';
-import StockAlerts from './pages/StockAlerts';
+import SalesTab from './pages/tabs/SalesTab';
+import StockTab from './pages/tabs/StockTab';
+import CreditTab from './pages/tabs/CreditTab';
+import TaxTab from './pages/tabs/TaxTab';
+import MoreTab from './pages/tabs/MoreTab';
+import QuickSale from './pages/sales/QuickSale';
+import SaleConfirmed from './pages/sales/SaleConfirmed';
+import BottomNav from './components/BottomNav';
 import StockNotifications from './pages/StockNotifications';
 import StockPredictions from './pages/StockPredictions';
 import ActivityFeed from './pages/ActivityFeed';
@@ -19,12 +24,7 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import PurchaseOrders from './pages/PurchaseOrders';
 import StockForecasting from './pages/StockForecasting';
-import AdminDashboard from './pages/AdminDashboard';
-import InventoryMetricsDashboard from './pages/InventoryMetricsDashboard';
-import SikasemDashboard from './pages/SikasemDashboard';
-import Sale from './pages/Sale';
-import CreditSecure from './pages/CreditSecure';
-import ComplianceDashboard from './pages/ComplianceDashboard';
+
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -49,6 +49,13 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Splash />} />
+      <Route path="/home" element={<><SalesTab /><BottomNav /></>} />
+      <Route path="/home/sale" element={<QuickSale />} />
+      <Route path="/sale-ok" element={<SaleConfirmed />} />
+      <Route path="/stock" element={<><StockTab /><BottomNav /></>} />
+      <Route path="/credit" element={<><CreditTab /><BottomNav /></>} />
+      <Route path="/tax" element={<><TaxTab /><BottomNav /></>} />
+      <Route path="/more" element={<><MoreTab /><BottomNav /></>} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/metrics" element={<MetricsDashboard />} />
       <Route path="/alerts" element={<StockAlerts />} />
