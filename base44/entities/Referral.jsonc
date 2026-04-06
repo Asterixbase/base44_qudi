@@ -1,0 +1,69 @@
+{
+  "name": "Referral",
+  "type": "object",
+  "properties": {
+    "circle_id": {
+      "type": "string",
+      "title": "Circle ID"
+    },
+    "referrer_id": {
+      "type": "string",
+      "title": "Referrer Member ID"
+    },
+    "referrer_name": {
+      "type": "string",
+      "title": "Referrer Name"
+    },
+    "invitee_email": {
+      "type": "string",
+      "title": "Invitee Email"
+    },
+    "invitee_name": {
+      "type": "string",
+      "title": "Invitee Name"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "joined",
+        "rewarded"
+      ],
+      "title": "Status"
+    },
+    "referrer_bonus_type": {
+      "type": "string",
+      "enum": [
+        "trust_boost",
+        "contribution_credit"
+      ],
+      "title": "Referrer Bonus Type"
+    },
+    "referrer_bonus_value": {
+      "type": "number",
+      "title": "Referrer Bonus Value"
+    },
+    "invitee_bonus_type": {
+      "type": "string",
+      "enum": [
+        "trust_boost",
+        "contribution_credit"
+      ],
+      "title": "Invitee Bonus Type"
+    },
+    "invitee_bonus_value": {
+      "type": "number",
+      "title": "Invitee Bonus Value"
+    },
+    "reward_note": {
+      "type": "string",
+      "title": "Reward Note"
+    }
+  },
+  "required": [
+    "circle_id",
+    "referrer_name",
+    "invitee_email",
+    "status"
+  ]
+}
