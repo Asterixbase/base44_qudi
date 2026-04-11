@@ -99,7 +99,7 @@ export default function Home() {
         {/* Quick actions */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {[
-            { label: '+ New Circle', to: '/circles', bg: C.gold, color: C.ink },
+            { label: '+ New Circle', to: '/invitations', bg: C.gold, color: C.ink },
             { label: '🤝 Join Circle', to: '/invitations', bg: C.ink, color: C.cream },
             { label: '📊 Reports', to: '/cash-flow', bg: C.tealBg, color: C.tealTx },
           ].map(a => (

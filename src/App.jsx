@@ -8,22 +8,27 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Splash from './pages/Splash';
 import Home from './pages/Home';
-import SoldToday from './pages/SoldToday';
-import LowStock from './pages/LowStock';
-import ProductDetail from './pages/ProductDetail';
-import QuickSale from './pages/sales/QuickSale';
-import SaleConfirmed from './pages/sales/SaleConfirmed';
-import StockNotifications from './pages/StockNotifications';
-import StockPredictions from './pages/StockPredictions';
-import ActivityFeed from './pages/ActivityFeed';
-import Scanner from './pages/Scanner';
-import Stock from './pages/Stock';
-import BarcodeInventoryScanner from './pages/BarcodeInventoryScanner';
-import Reports from './pages/Reports';
 import Settings from './pages/Settings';
-import PurchaseOrders from './pages/PurchaseOrders';
-import StockForecasting from './pages/StockForecasting';
-import BottomNav from './components/BottomNav';
+import CircleDetail from './pages/CircleDetail';
+import CollectDues from './pages/CollectDues';
+import PayoutScheduler from './pages/PayoutScheduler';
+import InviteSystem from './pages/InviteSystem';
+import MemberProfile from './pages/MemberProfile';
+import MemberContributionHistory from './pages/MemberContributionHistory';
+import PayoutRoadmap from './pages/PayoutRoadmap';
+import PenaltySettings from './pages/PenaltySettings';
+import CollectionMonitor from './pages/CollectionMonitor';
+import ReminderSchedule from './pages/ReminderSchedule';
+import CashFlowForecast from './pages/CashFlowForecast';
+import CrossBorderPayouts from './pages/CrossBorderPayouts';
+import DisputeDashboard from './pages/DisputeDashboard';
+import InsuranceManagement from './pages/InsuranceManagement';
+import ReferralHub from './pages/ReferralHub';
+import PenaltyLedgerPage from './pages/PenaltyLedgerPage';
+import Registration from './pages/Registration';
+import GuarantorHealth from './pages/GuarantorHealth';
+import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
+import ReconciliationPage from './pages/ReconciliationPage';
 
 
 const pageVariants = {
@@ -73,22 +78,31 @@ const AuthenticatedApp = () => {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageSlide><Splash /></PageSlide>} />
           <Route path="/dashboard" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<PageSlide><Home /><BottomNav /></PageSlide>} />
-          <Route path="/sold-today" element={<PageSlide><SoldToday /></PageSlide>} />
-          <Route path="/low-stock" element={<PageSlide><LowStock /></PageSlide>} />
-          <Route path="/product/:id" element={<PageSlide><ProductDetail /></PageSlide>} />
-          <Route path="/home/sale" element={<PageSlide><QuickSale /></PageSlide>} />
-          <Route path="/sale-ok" element={<PageSlide><SaleConfirmed /></PageSlide>} />
-          <Route path="/notifications" element={<PageSlide><StockNotifications /></PageSlide>} />
-          <Route path="/predictions" element={<PageSlide><StockPredictions /></PageSlide>} />
-          <Route path="/activity" element={<PageSlide><ActivityFeed /></PageSlide>} />
-          <Route path="/scan" element={<PageSlide><Scanner /></PageSlide>} />
-          <Route path="/stock-detail" element={<PageSlide><Stock /></PageSlide>} />
-          <Route path="/scan-inventory" element={<PageSlide><BarcodeInventoryScanner /></PageSlide>} />
-          <Route path="/reports" element={<PageSlide><Reports /></PageSlide>} />
+
+          {/* ── Qudi core ── */}
+          <Route path="/home" element={<PageSlide><Home /></PageSlide>} />
+          <Route path="/circle-detail" element={<PageSlide><CircleDetail /></PageSlide>} />
+          <Route path="/collect-dues" element={<PageSlide><CollectDues /></PageSlide>} />
+          <Route path="/payout-scheduler" element={<PageSlide><PayoutScheduler /></PageSlide>} />
+          <Route path="/invitations" element={<PageSlide><InviteSystem /></PageSlide>} />
+          <Route path="/member-profile" element={<PageSlide><MemberProfile /></PageSlide>} />
+          <Route path="/member-history" element={<PageSlide><MemberContributionHistory /></PageSlide>} />
+          <Route path="/payout-roadmap" element={<PageSlide><PayoutRoadmap /></PageSlide>} />
+          <Route path="/penalty-settings" element={<PageSlide><PenaltySettings /></PageSlide>} />
+          <Route path="/collection-monitor" element={<PageSlide><CollectionMonitor /></PageSlide>} />
+          <Route path="/reminders" element={<PageSlide><ReminderSchedule /></PageSlide>} />
+          <Route path="/cash-flow" element={<PageSlide><CashFlowForecast /></PageSlide>} />
+          <Route path="/cross-border" element={<PageSlide><CrossBorderPayouts /></PageSlide>} />
+          <Route path="/disputes" element={<PageSlide><DisputeDashboard /></PageSlide>} />
+          <Route path="/insurance" element={<PageSlide><InsuranceManagement /></PageSlide>} />
+          <Route path="/referrals" element={<PageSlide><ReferralHub /></PageSlide>} />
+          <Route path="/penalty-ledger" element={<PageSlide><PenaltyLedgerPage /></PageSlide>} />
+          <Route path="/guarantor-health" element={<PageSlide><GuarantorHealth /></PageSlide>} />
+          <Route path="/smart-payout" element={<PageSlide><SmartPayoutScheduler /></PageSlide>} />
+          <Route path="/reconciliation" element={<PageSlide><ReconciliationPage /></PageSlide>} />
+          <Route path="/register" element={<PageSlide><Registration /></PageSlide>} />
           <Route path="/settings" element={<PageSlide><Settings /></PageSlide>} />
-          <Route path="/purchase-orders" element={<PageSlide><PurchaseOrders /></PageSlide>} />
-          <Route path="/forecasting" element={<PageSlide><StockForecasting /></PageSlide>} />
+
           <Route path="*" element={<PageSlide><PageNotFound /></PageSlide>} />
         </Routes>
       </AnimatePresence>
