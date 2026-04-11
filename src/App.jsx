@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/toaster"
+import { AnimatePresence, motion } from 'framer-motion';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -25,7 +26,28 @@ import StockForecasting from './pages/StockForecasting';
 import BottomNav from './components/BottomNav';
 
 
+const pageVariants = {
+  initial: { x: '100%', opacity: 0 },
+  in:      { x: 0,      opacity: 1 },
+  out:     { x: '-30%', opacity: 0 },
+};
+const pageTransition = { type: 'tween', duration: 0.22, ease: 'easeInOut' };
+
+function PageSlide({ children }) {
+  return (
+    <motion.div
+      initial="initial" animate="in" exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      style={{ position: 'absolute', width: '100%', height: '100%', top: 0, left: 0, overflowY: 'auto' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 const AuthenticatedApp = () => {
+  const location = useLocation();
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -46,27 +68,31 @@ const AuthenticatedApp = () => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Splash />} />
-      <Route path="/dashboard" element={<Navigate to="/home" replace />} />
-      <Route path="/home" element={<><Home /><BottomNav /></>} />
-      <Route path="/sold-today" element={<SoldToday />} />
-      <Route path="/low-stock" element={<LowStock />} />
-      <Route path="/product/:id" element={<ProductDetail />} />
-      <Route path="/home/sale" element={<QuickSale />} />
-      <Route path="/sale-ok" element={<SaleConfirmed />} />
-      <Route path="/notifications" element={<StockNotifications />} />
-      <Route path="/predictions" element={<StockPredictions />} />
-      <Route path="/activity" element={<ActivityFeed />} />
-      <Route path="/scan" element={<Scanner />} />
-      <Route path="/stock-detail" element={<Stock />} />
-      <Route path="/scan-inventory" element={<BarcodeInventoryScanner />} />
-      <Route path="/reports" element={<Reports />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/purchase-orders" element={<PurchaseOrders />} />
-      <Route path="/forecasting" element={<StockForecasting />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+    <div className="safe-area-inset" style={{ position: 'relative', height: '100dvh', overflow: 'hidden' }}>
+      <AnimatePresence mode="wait" initial={false}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageSlide><Splash /></PageSlide>} />
+          <Route path="/dashboard" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<PageSlide><Home /><BottomNav /></PageSlide>} />
+          <Route path="/sold-today" element={<PageSlide><SoldToday /></PageSlide>} />
+          <Route path="/low-stock" element={<PageSlide><LowStock /></PageSlide>} />
+          <Route path="/product/:id" element={<PageSlide><ProductDetail /></PageSlide>} />
+          <Route path="/home/sale" element={<PageSlide><QuickSale /></PageSlide>} />
+          <Route path="/sale-ok" element={<PageSlide><SaleConfirmed /></PageSlide>} />
+          <Route path="/notifications" element={<PageSlide><StockNotifications /></PageSlide>} />
+          <Route path="/predictions" element={<PageSlide><StockPredictions /></PageSlide>} />
+          <Route path="/activity" element={<PageSlide><ActivityFeed /></PageSlide>} />
+          <Route path="/scan" element={<PageSlide><Scanner /></PageSlide>} />
+          <Route path="/stock-detail" element={<PageSlide><Stock /></PageSlide>} />
+          <Route path="/scan-inventory" element={<PageSlide><BarcodeInventoryScanner /></PageSlide>} />
+          <Route path="/reports" element={<PageSlide><Reports /></PageSlide>} />
+          <Route path="/settings" element={<PageSlide><Settings /></PageSlide>} />
+          <Route path="/purchase-orders" element={<PageSlide><PurchaseOrders /></PageSlide>} />
+          <Route path="/forecasting" element={<PageSlide><StockForecasting /></PageSlide>} />
+          <Route path="*" element={<PageSlide><PageNotFound /></PageSlide>} />
+        </Routes>
+      </AnimatePresence>
+    </div>
   );
 };
 

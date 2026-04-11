@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { C } from '../lib/qudiTokens';
 import KenteStripe from '../components/qudi/KenteStripe';
+import BottomSheet from '../components/BottomSheet';
 
 const STEPS = ['Personal', 'Identity', 'Verify', 'Terms'];
 
@@ -47,6 +48,7 @@ export default function Registration() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ fullName: '', phone: '', country: 'GH', otp: '' });
+  const [countrySheetOpen, setCountrySheetOpen] = useState(false);
   const selectedCountry = COUNTRIES.find(c => c.code === form.country) || COUNTRIES[0];
   const [kyc, setKyc] = useState('idle'); // idle | scanning | done
   const [errors, setErrors] = useState({});
@@ -103,14 +105,26 @@ export default function Registration() {
             <Field label="MoMo phone number" field="phone" type="tel" inputMode="numeric" placeholder="+233 XX XXX XXXX" form={form} errors={errors} update={update} />
             <div style={{ marginBottom: 18 }}>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>Country</label>
-              <select value={form.country} onChange={e => update('country', e.target.value)} style={{
-                width: '100%', padding: '13px 14px', borderRadius: 10, fontSize: 15,
-                border: `1.5px solid ${C.border}`, background: C.white, color: C.ink,
-              }}>
-                {COUNTRIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.currency})</option>
-                ))}
-              </select>
+              <button
+                type="button"
+                onClick={() => setCountrySheetOpen(true)}
+                style={{
+                  width: '100%', padding: '13px 14px', borderRadius: 10, fontSize: 15,
+                  border: `1.5px solid ${C.border}`, background: C.white, color: C.ink,
+                  textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}
+              >
+                <span>{selectedCountry.flag} {selectedCountry.name} ({selectedCountry.currency})</span>
+                <span style={{ color: C.muted }}>▾</span>
+              </button>
+              <BottomSheet
+                open={countrySheetOpen}
+                onClose={() => setCountrySheetOpen(false)}
+                title="Select country"
+                value={form.country}
+                onChange={v => update('country', v)}
+                options={COUNTRIES.map(c => ({ value: c.code, label: `${c.flag} ${c.name} (${c.currency})` }))}
+              />
             </div>
           </>
         )}

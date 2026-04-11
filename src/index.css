@@ -4,6 +4,25 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+/* ─── Mobile WebView globals ─────────────────────────────── */
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+button, a, [role="tab"], [role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safe-area-top    { padding-top:    env(safe-area-inset-top, 0px); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-area-inset  {
+  padding-top:    env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
   :root {
     --primary: 152 50% 41%;
@@ -16,6 +35,34 @@
     --muted: 0 0% 90%;
     --border: 0 0% 92%;
     --destructive: 0 84% 60%;
+  }
+
+  .dark {
+    --primary: 152 45% 55%;
+    --primary-light: 152 45% 65%;
+    --accent: 24 90% 60%;
+    --accent-light: 24 90% 70%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 92%;
+    --card: 0 0% 12%;
+    --muted: 0 0% 35%;
+    --border: 0 0% 20%;
+    --destructive: 0 80% 55%;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: 152 45% 55%;
+    --primary-light: 152 45% 65%;
+    --accent: 24 90% 60%;
+    --accent-light: 24 90% 70%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 92%;
+    --card: 0 0% 12%;
+    --muted: 0 0% 35%;
+    --border: 0 0% 20%;
+    --destructive: 0 80% 55%;
   }
 }
 

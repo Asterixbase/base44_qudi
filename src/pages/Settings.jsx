@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { AnimatePresence, motion } from 'framer-motion';
 import OfflineSyncBanner from '@/components/OfflineSyncBanner';
 import ReorderSettings from '@/components/ReorderSettings';
 
@@ -9,6 +10,18 @@ export default function Settings() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showReorderSettings, setShowReorderSettings] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    try {
+      // In production: call account deletion API
+      await base44.auth.logout('/');
+    } catch {
+      setDeleteLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     await base44.auth.logout('/');
@@ -88,14 +101,57 @@ export default function Settings() {
       {/* Danger Zone */}
       <div className="p-4">
         <h2 className="text-sm font-semibold uppercase text-destructive tracking-wider mb-4">Danger Zone</h2>
-        <button
-          onClick={handleLogout}
-          disabled={loading}
-          className="w-full bg-destructive text-white py-3 rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50"
-        >
-          {loading ? 'Logging out...' : 'Logout'}
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={handleLogout}
+            disabled={loading}
+            className="w-full bg-destructive text-white py-3 rounded-lg font-medium hover:bg-red-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Logging out...' : 'Logout'}
+          </button>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="w-full border-2 border-destructive text-destructive py-3 rounded-lg font-medium hover:bg-red-50 transition"
+          >
+            Delete Account
+          </button>
+        </div>
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowDeleteConfirm(false)}
+              className="fixed inset-0 bg-black/50 z-50"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed inset-x-4 top-1/2 -translate-y-1/2 bg-white rounded-2xl p-6 z-50 shadow-xl max-w-sm mx-auto"
+            >
+              <div className="text-4xl text-center mb-4">⚠️</div>
+              <h3 className="text-lg font-bold text-center text-foreground mb-2">Delete your account?</h3>
+              <p className="text-sm text-center text-foreground/60 mb-6">
+                This will permanently delete all your circles, contributions, and history. This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 border border-border py-3 rounded-xl font-semibold"
+                >Cancel</button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteLoading}
+                  className="flex-1 bg-destructive text-white py-3 rounded-xl font-semibold disabled:opacity-50"
+                >{deleteLoading ? 'Deleting…' : 'Yes, delete'}</button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { base44 } from '@/api/base44Client';
 import { C } from '../lib/qudiTokens';
 import KenteStripe from '../components/qudi/KenteStripe';
@@ -28,6 +30,16 @@ export default function Home() {
       .then(data => { if (data?.length) setCircles(data); })
       .catch(() => {});
   }, []);
+
+  const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    queryClient.invalidateQueries();
+    const data = await base44.entities.Circle.list('-created_date', 20).catch(() => null);
+    if (data?.length) setCircles(data);
+  }, [queryClient]);
+
+  const { containerRef, pulling, progress } = usePullToRefresh(handleRefresh);
 
   const totalPot = circles.filter(c => c.status === 'active').reduce((s, c) => s + (c.pot_balance || 0), 0);
   const activeCount = circles.filter(c => c.status === 'active').length;
@@ -66,8 +78,24 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Pull-to-refresh indicator */}
+      {pulling && (
+        <div style={{
+          height: Math.round(progress * 44), overflow: 'hidden', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', background: C.ink,
+          transition: 'height 0.1s',
+        }}>
+          <div style={{
+            width: 20, height: 20, border: `3px solid rgba(235,160,32,0.3)`,
+            borderTopColor: C.gold, borderRadius: '50%',
+            animation: progress >= 1 ? 'spin 0.6s linear infinite' : 'none',
+            transform: `rotate(${progress * 270}deg)`,
+          }} />
+        </div>
+      )}
+
       {/* Body */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', paddingBottom: 80 }}>
+      <div ref={containerRef} style={{ flex: 1, overflowY: 'auto', padding: '16px', paddingBottom: 80 }}>
         {/* Quick actions */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {[

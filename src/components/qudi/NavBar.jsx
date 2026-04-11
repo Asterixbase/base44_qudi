@@ -13,7 +13,7 @@ const NAV_ITEMS = [
 export default function NavBar() {
   const { pathname } = useLocation();
   return (
-    <div style={{ borderTop: `1px solid ${C.border}`, background: C.white }}>
+    <div style={{ borderTop: `1px solid ${C.border}`, background: C.white, paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       <div style={{ display: 'flex' }}>
         {NAV_ITEMS.map(({ label, icon, path }) => {
           const active = pathname === path && (path !== '/dashboard' || label === 'Home');
@@ -23,6 +23,7 @@ export default function NavBar() {
               textDecoration: 'none', color: active ? C.goldText : C.muted,
               fontSize: 10, fontWeight: active ? 600 : 400, minHeight: 44,
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+              userSelect: 'none', WebkitUserSelect: 'none', WebkitTapHighlightColor: 'transparent',
             }}>
               <span style={{ fontSize: 16 }}>{icon}</span>
               {label}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import BottomSheet from '../components/BottomSheet';
 import { C } from '../lib/qudiTokens';
 import Header from '../components/qudi/Header';
 import KenteStripe from '../components/qudi/KenteStripe';
@@ -16,6 +17,7 @@ export default function CrossBorderPayouts() {
   
   // Form state
   const [selectedCountry, setSelectedCountry] = useState('UK');
+  const [countrySheetOpen, setCountrySheetOpen] = useState(false);
   const [amountGBP, setAmountGBP] = useState('');
   const [bankAccount, setBankAccount] = useState('');
   const [recipientPhone, setRecipientPhone] = useState('');
@@ -166,14 +168,26 @@ export default function CrossBorderPayouts() {
           <>
             <div style={{ background: C.white, borderRadius: 12, padding: '16px', marginBottom: 16, border: `1px solid ${C.border}` }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: C.muted, marginBottom: 12 }}>COUNTRY</div>
-              <select value={selectedCountry} onChange={e => setSelectedCountry(e.target.value)} style={{
-                width: '100%', padding: '10px', border: `1px solid ${C.border}`, borderRadius: 8,
-                fontSize: 13, fontWeight: 600, color: C.ink,
-              }}>
-                {Object.entries(EXCHANGE_RATES).map(([key, val]) => (
-                  <option key={key} value={key}>{val.country} ({val.currency})</option>
-                ))}
-              </select>
+              <button
+                type="button"
+                onClick={() => setCountrySheetOpen(true)}
+                style={{
+                  width: '100%', padding: '10px', border: `1px solid ${C.border}`, borderRadius: 8,
+                  fontSize: 13, fontWeight: 600, color: C.ink, background: C.white,
+                  textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}
+              >
+                <span>{EXCHANGE_RATES[selectedCountry]?.country} ({EXCHANGE_RATES[selectedCountry]?.currency})</span>
+                <span style={{ color: C.muted }}>▾</span>
+              </button>
+              <BottomSheet
+                open={countrySheetOpen}
+                onClose={() => setCountrySheetOpen(false)}
+                title="Select country"
+                value={selectedCountry}
+                onChange={setSelectedCountry}
+                options={Object.entries(EXCHANGE_RATES).map(([key, val]) => ({ value: key, label: `${val.country} (${val.currency})` }))}
+              />
             </div>
 
             <div style={{ background: C.white, borderRadius: 12, padding: '16px', marginBottom: 16, border: `1px solid ${C.border}` }}>
