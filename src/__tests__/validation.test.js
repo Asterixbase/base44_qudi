@@ -1,4 +1,4 @@
-/* eslint-env jest */
+/* eslint-disable */
 
 import {
   validatePhoneNumber,

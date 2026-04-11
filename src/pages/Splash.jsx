@@ -10,7 +10,7 @@ export default function Splash() {
       try {
         const isAuth = await base44.auth.isAuthenticated();
         if (isAuth) {
-          navigate('/dashboard');
+          navigate('/home');
         } else {
           navigate('/login');
         }

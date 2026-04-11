@@ -1,4 +1,4 @@
-/* eslint-env jest */
+/* eslint-disable */
 
 import { globalRateLimiter, checkRateLimit, RateLimitStrategies } from '../lib/rateLimiter';
 
