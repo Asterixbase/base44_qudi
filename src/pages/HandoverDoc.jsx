@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { base44 } from '@/api/base44Client';
 
 const S = {
   page: { fontFamily: 'Inter, Arial, sans-serif', background: '#fff', color: '#1A1208', maxWidth: 900, margin: '0 auto', padding: '40px 48px' },
@@ -299,6 +300,7 @@ function ScreenCard({ screen }) {
 export default function HandoverDoc() {
   const contentRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
+  const [githubStatus, setGithubStatus] = useState(null); // null | 'pushing' | 'done' | 'error'
 
   useEffect(() => {
     const timer = setTimeout(() => handleDownloadPDF(), 1500);
@@ -307,6 +309,7 @@ export default function HandoverDoc() {
 
   const handleDownloadPDF = async () => {
     setDownloading(true);
+    setGithubStatus(null);
     try {
       const element = contentRef.current;
       const canvas = await html2canvas(element, {
@@ -332,6 +335,18 @@ export default function HandoverDoc() {
         pageCount++;
       }
       pdf.save('Qudi-Agency-Handover-Document.pdf');
+
+      // Push to GitHub
+      setGithubStatus('pushing');
+      const pdfBase64 = pdf.output('datauristring').split(',')[1];
+      const res = await base44.functions.invoke('pushPDFToGitHub', {
+        base64Content: pdfBase64,
+        filePath: 'docs/Qudi-Agency-Handover.pdf',
+      });
+      setGithubStatus(res.data?.success ? 'done' : 'error');
+    } catch (e) {
+      console.error('PDF/GitHub error:', e);
+      setGithubStatus('error');
     } finally {
       setDownloading(false);
     }
@@ -357,7 +372,7 @@ export default function HandoverDoc() {
             display: 'flex', alignItems: 'center', gap: 8,
           }}
         >
-          {downloading ? '⏳ Generating PDF...' : '⬇ Download PDF'}
+          {downloading ? '⏳ Generating PDF...' : githubStatus === 'pushing' ? '☁️ Pushing to GitHub...' : githubStatus === 'done' ? '✅ Saved to GitHub' : githubStatus === 'error' ? '⚠️ GitHub push failed' : '⬇ Download PDF'}
         </button>
       </div>
 
