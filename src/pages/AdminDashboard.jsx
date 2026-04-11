@@ -26,6 +26,19 @@ export default function AdminDashboard() {
 
   // Restrict access to admin users only
   if (user && user.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center max-w-sm">
+          <div className="text-5xl mb-4">🔒</div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Restricted</h1>
+          <p className="text-foreground/70 mb-6">Only admin users can access financial reports and inventory data.</p>
+          <button onClick={() => navigate('/home')} className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-light transition">
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const exportData = async (type) => {
     try {

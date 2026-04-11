@@ -32,12 +32,7 @@ export const decrypt = async (encryptedData) => {
   return new TextDecoder().decode(decrypted);
 };
 
-// Dummy decipher reference removed - see decrypt above
-const _unused = (iv) => iv;
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
-};
+
 
 export const maskPII = (value, type = 'phone') => {
   if (!value) return null;

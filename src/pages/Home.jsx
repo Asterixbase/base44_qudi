@@ -29,7 +29,7 @@ export default function Home() {
       <div className="bg-primary text-white p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold">Sikasem</h1>
+            <h1 className="text-lg font-bold">Qudi</h1>
             <p className="text-sm text-primary-light">Ama's Provision Store</p>
           </div>
           <div className="bg-primary-light rounded-full w-8 h-8 flex items-center justify-center text-white font-bold">AA</div>
