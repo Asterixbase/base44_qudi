@@ -62,8 +62,31 @@ export default function PayoutScheduler() {
     if (!circle || sequence.length === 0) return;
     setExecuting(true);
     const recipient = sequence[0];
+    const payoutAmount = (circle.contribution_amount || 0) * members.length;
+
+    // 1. Update DB records via existing lib
     const res = await executeNextPayout({ circle, recipient, allMembers: members });
-    setResult({ recipient, ...res });
+
+    // 2. Send real MoMo disbursement
+    let momoStatus = 'PENDING';
+    try {
+      const momoRes = await base44.functions.invoke('sendPayoutMoMo', {
+        circleId: circle.id,
+        cycleName: `Cycle ${circle.current_cycle || 1}`,
+        member: {
+          id:            recipient.id,
+          full_name:     recipient.full_name,
+          phone:         recipient.phone,
+          payout_amount: payoutAmount,
+        },
+      });
+      momoStatus = momoRes.data?.status || 'PENDING';
+    } catch (e) {
+      console.error('MoMo payout error:', e);
+      momoStatus = 'ERROR';
+    }
+
+    setResult({ recipient, ...res, momoStatus });
     // Refresh members + sequence
     const updated = await base44.entities.Member.filter({ circle_id: circle.id });
     setMembers(updated);
@@ -139,6 +162,11 @@ export default function PayoutScheduler() {
                 <div style={{ fontWeight: 700, fontSize: 14, color: '#155724' }}>🎉 Payout Initiated!</div>
                 <div style={{ fontSize: 13, color: '#155724', marginTop: 4 }}>
                   <strong>GHS {result.payoutAmount?.toLocaleString()}</strong> sent to <strong>{result.recipient?.full_name}</strong>.
+                  {result.momoStatus && (
+                    <span style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
+                      MoMo: <strong>{result.momoStatus}</strong>
+                    </span>
+                  )}
                   {result.isComplete && <span style={{ display: 'block', marginTop: 4, fontWeight: 700 }}>✅ All members paid — circle marked as Completed!</span>}
                 </div>
               </div>

@@ -31,28 +31,36 @@ export default function CollectDues() {
 
   const pending = MEMBERS.filter(m => m.payment_status !== 'paid');
 
-  const simulateCollections = () => {
+  const runCollection = async () => {
     setLiveMode(true);
     setCollecting(true);
-    let delay = 0;
-    MEMBERS.forEach(m => {
-      if (m.payment_status === 'paid') {
-        setResults(r => ({ ...r, [m.id]: 'paid' }));
-        return;
+    const membersToCollect = MEMBERS
+      .filter(m => m.payment_status !== 'paid')
+      .map(m => ({ ...m, contribution_amount: 200 }));
+
+    try {
+      const res = await base44.functions.invoke('collectMoMoDues', {
+        circleId: 'c1',
+        cycleName: 'Cycle 3',
+        members: membersToCollect,
+      });
+      const apiResults = res.data?.results || [];
+      const mapped = {};
+      for (const r of apiResults) {
+        mapped[r.memberId] = r.status === 'SUCCESSFUL' ? 'paid' : r.status === 'FAILED' ? 'failed' : 'pending';
       }
-      delay += 1200;
-      setTimeout(() => {
-       const outcome = m.payment_status === 'failed' ? 'failed' : 'paid';
-       setResults(r => ({ ...r, [m.id]: outcome }));
-       // Save to DB
-       base44.entities.Transaction.create({
-         circle_id: 'c1', member_id: m.id, member_name: m.full_name,
-         type: 'collection', amount: 200, status: outcome,
-         momo_ref: `QC${Date.now()}`, cycle: 3,
-       }).catch(err => console.error('Transaction save failed:', err));
-      }, delay);
-    });
-    setTimeout(() => setCollecting(false), delay + 500);
+      // Already-paid members
+      MEMBERS.filter(m => m.payment_status === 'paid').forEach(m => { mapped[m.id] = 'paid'; });
+      setResults(mapped);
+    } catch (e) {
+      console.error('MoMo collection error:', e);
+      // Fallback: mark all as error
+      const errMap = {};
+      MEMBERS.forEach(m => { errMap[m.id] = m.payment_status === 'paid' ? 'paid' : 'failed'; });
+      setResults(errMap);
+    } finally {
+      setCollecting(false);
+    }
   };
 
   if (liveMode) {
@@ -129,7 +137,7 @@ export default function CollectDues() {
             title="Authorise collection"
             amount={`GHS ${pending.length * 200}`}
             recipient={`${pending.length} members`}
-            onConfirm={() => { setShowPIN(false); simulateCollections(); }}
+            onConfirm={() => { setShowPIN(false); runCollection(); }}
             onCancel={() => setShowPIN(false)}
           />
         )}
@@ -203,7 +211,7 @@ export default function CollectDues() {
           title="Authorise collection"
           amount={`GHS ${pending.length * 200}`}
           recipient={`${pending.length} members`}
-          onConfirm={() => { setShowPIN(false); setLiveMode(true); simulateCollections(); }}
+          onConfirm={() => { setShowPIN(false); runCollection(); }}
           onCancel={() => setShowPIN(false)}
         />
       )}
