@@ -12,7 +12,7 @@ export default function Splash() {
         if (isAuth) {
           navigate('/home');
         } else {
-          navigate('/login');
+          base44.auth.redirectToLogin('/home');
         }
       } catch {
         navigate('/login');
