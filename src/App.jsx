@@ -26,6 +26,7 @@ import InsuranceManagement from './pages/InsuranceManagement';
 import ReferralHub from './pages/ReferralHub';
 import PenaltyLedgerPage from './pages/PenaltyLedgerPage';
 import Registration from './pages/Registration';
+import HandoverDoc from './pages/HandoverDoc';
 import GuarantorHealth from './pages/GuarantorHealth';
 import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 import ReconciliationPage from './pages/ReconciliationPage';
@@ -102,6 +103,7 @@ const AuthenticatedApp = () => {
           <Route path="/reconciliation" element={<PageSlide><ReconciliationPage /></PageSlide>} />
           <Route path="/register" element={<PageSlide><Registration /></PageSlide>} />
           <Route path="/settings" element={<PageSlide><Settings /></PageSlide>} />
+          <Route path="/handover" element={<HandoverDoc />} />
 
           <Route path="*" element={<PageSlide><PageNotFound /></PageSlide>} />
         </Routes>
