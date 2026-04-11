@@ -15,7 +15,7 @@ export default function Splash() {
           base44.auth.redirectToLogin('/home');
         }
       } catch {
-        navigate('/login');
+        base44.auth.redirectToLogin('/home');
       }
     };
 
