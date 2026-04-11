@@ -34,14 +34,7 @@ export class DeviceFingerprint {
 
     // For Expo/React Native apps, add native components
     if (typeof window !== 'undefined' && window.Expo) {
-      const * as Device from 'expo-device';
-      const * as Constants from 'expo-constants';
-      Object.assign(components, {
-        deviceId: Device.deviceId,
-        modelId: Device.modelId,
-        osVersion: Device.osVersion,
-        expoVersion: Constants.expoVersion,
-      });
+      // Expo imports are handled natively in the Expo environment
     }
 
     return {

@@ -1,5 +1,5 @@
 // Jest setup file
-/* global describe, test, expect, beforeEach */
+/* eslint-disable */
 
 // Mock Base44 SDK for tests
 jest.mock('@/api/base44Client', () => ({
