@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -39,6 +39,12 @@ function Row({ children, alt }) {
 export default function HandoverDoc() {
   const contentRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
+
+  // Auto-download on mount after content renders
+  useEffect(() => {
+    const timer = setTimeout(() => handleDownloadPDF(), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleDownloadPDF = async () => {
     setDownloading(true);
