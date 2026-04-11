@@ -36,11 +36,270 @@ function Row({ children, alt }) {
   );
 }
 
+const STATUS_COLORS = {
+  Core:       { bg: '#D4EDDA', color: '#155724' },
+  Analytics:  { bg: '#D1ECF1', color: '#0C5460' },
+  Finance:    { bg: '#FFF8E1', color: '#856404' },
+  Config:     { bg: '#E2D9F3', color: '#4A235A' },
+  Detail:     { bg: '#F7F2E8', color: '#6B5A3A' },
+  Operations: { bg: '#D4EDDA', color: '#1B5E20' },
+  Governance: { bg: '#FCE4E4', color: '#721C24' },
+  Growth:     { bg: '#D1ECF1', color: '#155724' },
+  Onboarding: { bg: '#FFF8E1', color: '#856404' },
+  System:     { bg: '#F7F2E8', color: '#3A2A10' },
+  Entry:      { bg: '#1A1208', color: '#EBA020' },
+};
+
+const SCREENS = [
+  {
+    route: '/',
+    name: 'Splash Screen',
+    file: 'pages/Splash.jsx',
+    status: 'Entry',
+    description: 'Full-screen dark splash with Qudi logo and animated spinner. Checks auth after 1.5s — authenticated users go to /home, others to platform login.',
+    elements: ['🫂 Qudi logo (gold on dark ink)', 'Tagline: "Money Circles, Built on Trust"', 'Animated spinner (white)', 'No nav bar — entry-only screen'],
+    flow: '→ /home (authenticated) or Platform Login (unauthenticated)',
+  },
+  {
+    route: '/home',
+    name: 'Home Dashboard',
+    file: 'pages/Home.jsx',
+    status: 'Core',
+    description: 'Main dashboard. Shows all the user\'s circles with pot balances and status. Displays total escrow and active circle count in header. Pull-to-refresh syncs live DB data.',
+    elements: ['Dark header with user initials avatar (top right)', 'KenteStripe decorative bar below header', 'Total pot balance (GHS) + active circle count', 'Quick actions: + New Circle, 🤝 Join Circle, 📊 Reports', 'Circle cards: name, status badge, amount/frequency, pot balance, cycle #', '🛡 Insured badge on insured circles', 'Empty state: "No circles yet" with 🫂 emoji', 'Bottom NavBar (Home | Circles | Reminders | Alerts | More)'],
+    flow: '→ /circle-detail (tap card) → /invitations (+ New Circle) → /cash-flow (Reports)',
+  },
+  {
+    route: '/circle-detail',
+    name: 'Circle Detail',
+    file: 'pages/CircleDetail.jsx',
+    status: 'Core',
+    description: 'Full circle management hub. Organiser can see the full member grid with payment statuses, initiate actions, resolve disputes, and generate PDF summaries of the circle.',
+    elements: ['Pot balance + current cycle indicator', 'Member grid: initials avatar, name, trust score bar, payment status chip', 'Payment chips: ✅ Paid / ⏳ Pending / ❌ Failed / 🔴 Overdue', 'Tap member → MarkPaidModal (manual payment)', '🚩 Flag → DisputeModal (raise dispute)', 'Action bar: Collect Dues, Payout, 🗺 Roadmap, Invitations, Penalties', 'PenaltyBanner for overdue members', 'FraudAlert banner if suspicious activity', 'CircleAnalytics mini charts', 'Download Circle Summary PDF'],
+    flow: '→ /collect-dues → /payout-scheduler → /payout-roadmap → /invitations → /penalty-settings → /member-profile → /member-history',
+  },
+  {
+    route: '/collect-dues',
+    name: 'Collect Dues',
+    file: 'pages/CollectDues.jsx',
+    status: 'Core',
+    description: 'Live MoMo collection workflow. Organiser reviews each member\'s risk before sending bulk collection requests. Requires 4-digit PIN to authorise. Tracks live success/failure per member.',
+    elements: ['Member list with trust score + risk indicator (green/amber/red)', 'Payment status + MoMo phone number per member', '"Send collection requests" CTA button', 'PINConfirm overlay — 4-digit PIN required to proceed', 'Live tracker: Sent / Confirmed / Failed counts update in real time', 'Per-member row: shows ✅ confirmed or ❌ failed as collection runs', 'Summary screen on completion', 'Transaction records saved to DB'],
+    flow: '← /circle-detail → PIN modal → Live tracking → back to /circle-detail',
+  },
+  {
+    route: '/payout-scheduler',
+    name: 'Payout Scheduler',
+    file: 'pages/PayoutScheduler.jsx',
+    status: 'Core',
+    description: 'Manages the payout queue and order. Supports 4 order modes. Organiser selects circle, reviews the queue, and initiates the next cycle payout.',
+    elements: ['Circle selector dropdown', 'Payout order mode chips: Random / Fixed / Rotation / Bid', 'Bid input fields per member (bid mode only)', 'Ordered payout queue list with position numbers', '"Has Received Payout" greyed-out badge', 'Next recipient highlighted in gold', '🚀 Initiate Payout button', 'Progress indicator: X of Y members paid', 'DB updated on payout execution'],
+    flow: '← /circle-detail → choose circle → review queue → initiate payout',
+  },
+  {
+    route: '/invitations',
+    name: 'Invite System',
+    file: 'pages/InviteSystem.jsx',
+    status: 'Core',
+    description: 'Generates personalised deep-link invitations for new members. Tracks status from sent through to joined. Logs simulated SMS and records guarantor linkage.',
+    elements: ['Circle selector', 'Stats bar: Sent / Joined / Pending / Expired counts', 'Create Invite form: invitee name, phone, email, note', 'Guarantor fields: name + phone', 'Generated invite code + deep link URL', 'Copy to clipboard button', 'Simulated SMS log display', 'Invitation list with status chips (pending/viewed/joined/expired)', 'Mark guarantor linked toggle', 'Expiry date shown per invitation'],
+    flow: '← /home or /circle-detail → create invite → track status',
+  },
+  {
+    route: '/member-profile',
+    name: 'Member Profile',
+    file: 'pages/MemberProfile.jsx',
+    status: 'Detail',
+    description: 'Individual member profile card. Shows KYC status, trust score tier, payment history summary, and linked guarantor details.',
+    elements: ['Large initials avatar with circle colour', 'Trust score badge with tier label (Trusted / Verified / Building / New)', 'KYC verified ✅ / unverified badge', 'MoMo phone number', 'Payout position in circle queue', 'Summary stats: total paid / missed / overdue counts', 'Guarantor name + phone', '"View Full History" → /member-history'],
+    flow: '← /circle-detail → /member-history',
+  },
+  {
+    route: '/member-history',
+    name: 'Contribution History',
+    file: 'pages/MemberContributionHistory.jsx',
+    status: 'Detail',
+    description: 'Full chronological payment timeline for one member in one circle. Every cycle shown with date, amount, and status colour chip.',
+    elements: ['Member name + circle name in header', 'Cycle-by-cycle timeline list', 'Each row: Cycle # / Date / Amount GHS / Status chip', 'Status colours: green=paid, amber=pending, red=failed/overdue', 'Summary footer: Total paid GHS / Missed count / Avg days late'],
+    flow: '← /member-profile or /circle-detail',
+  },
+  {
+    route: '/payout-roadmap',
+    name: 'Payout Roadmap',
+    file: 'pages/PayoutRoadmap.jsx',
+    status: 'Detail',
+    description: 'Visual multi-cycle payout timeline. Shows every member\'s scheduled payout slot across all remaining cycles, and which members have already received.',
+    elements: ['Circle selector', 'Multi-row timeline: one row per cycle', 'Member avatar in their payout slot per cycle', 'Current cycle highlighted with gold border', '"Has received" members greyed out', 'Pot balance vs total distributed', 'Cycles remaining count'],
+    flow: '← /circle-detail',
+  },
+  {
+    route: '/penalty-settings',
+    name: 'Penalty Settings',
+    file: 'pages/PenaltySettings.jsx',
+    status: 'Config',
+    description: 'Per-circle penalty rule configuration. Choose penalty type, amounts, grace period, and whether to notify the guarantor when a penalty is applied.',
+    elements: ['Circle selector dropdown', 'Enable penalties toggle (on/off)', 'Penalty type radio: Flat Fee / Percentage of Contribution / Daily Interest', 'Flat fee GHS input', 'Percentage % input', 'Daily interest rate % input', 'Grace period days input', 'Notify guarantor on penalty toggle', 'Save Settings button → updates Circle entity in DB'],
+    flow: '← /circle-detail',
+  },
+  {
+    route: '/collection-monitor',
+    name: 'Collection Monitor',
+    file: 'pages/CollectionMonitor.jsx',
+    status: 'Analytics',
+    description: 'Real-time health snapshot across all active circles. Flags circles at risk of shortfall and overdue members needing immediate action.',
+    elements: ['Summary row: Total Active / Healthy / At Risk / Overdue member count', 'Per-circle health card with colour (green=healthy / amber=at risk / red=critical)', 'Collection rate % per circle', 'Days until next due date', 'Overdue member chips per circle', 'Quick-send reminder button per circle', 'Last refreshed timestamp'],
+    flow: '← NavBar "Alerts" tab',
+  },
+  {
+    route: '/reminders',
+    name: 'Reminder Schedule',
+    file: 'pages/ReminderSchedule.jsx',
+    status: 'Operations',
+    description: 'Manage all scheduled SMS and in-app payment reminders. View, send now, or bulk-send pending reminders per circle.',
+    elements: ['Circle selector', 'Scheduled reminder list per circle', 'Reminder type chip: SMS / In-App', 'Scheduled date + recipient name', 'Status chip: scheduled / sent / failed', '"Send Now" per-reminder button', '"Send All Pending" bulk button', 'Notification entity records created on send'],
+    flow: '← NavBar "Reminders" tab',
+  },
+  {
+    route: '/cash-flow',
+    name: 'Cash Flow Forecast',
+    file: 'pages/CashFlowForecast.jsx',
+    status: 'Analytics',
+    description: 'AI-assisted multi-cycle collection projections using member reliability scoring (via Base44 InvokeLLM / Gemini Flash). Projects expected vs at-risk GHS collections per circle.',
+    elements: ['Summary bar: Active / Healthy / At Risk / Cycles Ahead', 'Circle selector', 'Recharts bar chart: projected collection per upcoming cycle', 'Member reliability score list (colour-coded)', 'Healthy (green) / At Risk (amber) per member', 'Recommendations panel for at-risk members', 'Forecast horizon selector: 2 / 4 / 6 cycles', 'AI model: gemini_3_flash (InvokeLLM integration)'],
+    flow: '← /home "Reports" button or NavBar',
+  },
+  {
+    route: '/cross-border',
+    name: 'Cross-Border Payouts',
+    file: 'pages/CrossBorderPayouts.jsx',
+    status: 'Finance',
+    description: 'FCA-regulated UK diaspora payout management. Calculates GBP→GHS with country-specific FCA compliance fees. 3-step form flow: enter amount → review conversion → confirm.',
+    elements: ['Payout history list with status chips', 'Step 1: Country (UK/US/EU/AUS) + GBP amount + member selector', 'Step 2: Live exchange rate / GHS equivalent / FCA compliance fee breakdown', 'Net GHS the recipient receives (highlighted)', 'UK bank account (last 4 digits)', 'GHS MoMo recipient phone', 'FCA reference field', 'Step 3: Final summary → Confirm & Submit', 'Record saved to CrossBorderPayout entity'],
+    flow: '← NavBar or home → 3-step form',
+  },
+  {
+    route: '/disputes',
+    name: 'Dispute Dashboard',
+    file: 'pages/DisputeDashboard.jsx',
+    status: 'Governance',
+    description: 'Full dispute management. Organiser can review all raised disputes, hold funds in escrow, add notes, and resolve or reject cases.',
+    elements: ['Dispute list: type chip + member name + circle + flagged amount', 'Type chips: Payment Status / Suspicious Transaction / Missed Payout', 'Status chips: Open / Under Review / Escrow Held / Resolved / Rejected', 'Proof of payment URL link', 'Escrow toggle + escrow amount input', 'Organiser note textarea', '"Resolve" and "Reject" action buttons', 'Dispute record updated in DB on action'],
+    flow: '← NavBar or /circle-detail "🚩 Flag" action',
+  },
+  {
+    route: '/insurance',
+    name: 'Insurance Management',
+    file: 'pages/InsuranceManagement.jsx',
+    status: 'Finance',
+    description: 'GLICO insurance claim submission and tracking for insured circles. Members submit evidence for missed payouts, defaults, fraud, or hardship events.',
+    elements: ['Claims list with status chips (submitted/under_review/approved/rejected/paid_out)', 'Claim type selector (5 types)', 'Amount claimed (GHS) input', 'Description textarea', 'Evidence file upload → UploadFile integration → URL stored in DB', 'Auto-generated claim reference number', 'Insurer note (admin-filled on review)', 'Approved payout amount displayed on approval', 'InsuranceClaim entity created in DB'],
+    flow: '← NavBar or /circle-detail',
+  },
+  {
+    route: '/referrals',
+    name: 'Referral Hub',
+    file: 'pages/ReferralHub.jsx',
+    status: 'Growth',
+    description: 'Track member referrals and assign rewards. Both referrer and invitee earn trust-boost or contribution-credit bonuses when a referral completes.',
+    elements: ['Referral list: referrer → invitee name + email', 'Status chips: pending / joined / rewarded', 'Referrer bonus: type (trust_boost / contribution_credit) + value', 'Invitee bonus: type + value', 'Reward note field', 'Summary: total referrals / rewarded count', 'Referral entity records in DB'],
+    flow: '← NavBar or /circle-detail',
+  },
+  {
+    route: '/penalty-ledger',
+    name: 'Penalty Ledger',
+    file: 'pages/PenaltyLedgerPage.jsx',
+    status: 'Finance',
+    description: 'Full accounting ledger for all penalty records. Auto-scans for overdue members, calculates penalty amounts per circle rules, and tracks settlement per entry.',
+    elements: ['Summary bar: Total entries / Outstanding count / Total owed GHS', '⚡ Run Auto-Penalty Scan button (scans all circles)', 'Advanced date controls expand panel', 'Filter tabs: All / Outstanding / Settled / Waived', 'Ledger rows: member / circle / cycle / penalty type / GHS amount / days late / settlement', 'Settlement method chips: payout_deduction / manual_payment / waived', '"Waive" action per outstanding entry', 'PenaltyLedger entity records in DB'],
+    flow: '← NavBar or /circle-detail',
+  },
+  {
+    route: '/guarantor-health',
+    name: 'Guarantor Health',
+    file: 'pages/GuarantorHealth.jsx',
+    status: 'Analytics',
+    description: 'Admin-only dashboard. Scores every guarantor\'s risk based on linked members\' payment patterns. Flags guarantors with high-risk exposures.',
+    elements: ['🔒 Admin access gate — non-admin users see lock screen', 'Guarantor risk score (0–100) per guarantor', 'Linked member count + overdue member count', 'Risk tier badge: Low (green) / Medium (amber) / High (red) / Critical (dark red)', 'Circle coverage list per guarantor', 'Total GHS exposure amount', '"Contact Guarantor" action button'],
+    flow: '← NavBar More or /circle-detail',
+  },
+  {
+    route: '/smart-payout',
+    name: 'Smart Payout Scheduler',
+    file: 'pages/SmartPayoutScheduler.jsx',
+    status: 'Analytics',
+    description: 'AI-assisted payout prioritisation. Adjusts payout order using member risk scores and payment history. Organiser can accept AI suggestion or override manually.',
+    elements: ['Circle selector', 'Risk-adjusted payout queue (AI-ordered)', 'Risk tier chip per member in queue', 'Trust score per queue entry', 'AI rationale text per prioritisation decision', '"Swap Position" button per member', '"Override to Manual Order" toggle', '"Confirm AI-Suggested Order" button → updates payout sequence in DB'],
+    flow: '← NavBar More or /circle-detail',
+  },
+  {
+    route: '/reconciliation',
+    name: 'Reconciliation',
+    file: 'pages/ReconciliationPage.jsx',
+    status: 'Finance',
+    description: 'End-of-cycle reconciliation tool. Compares expected total collections against actual amounts received. Surfaces shortfalls and unresolved discrepancies for the organiser.',
+    elements: ['Circle + cycle selector', 'Expected total GHS vs Actual received GHS', 'Shortfall amount (red highlight if > 0)', 'Per-member breakdown table: expected vs paid vs difference', 'Unreconciled items list', '"Export Report" button', '"Mark Cycle Reconciled" button → updates Circle entity'],
+    flow: '← NavBar More',
+  },
+  {
+    route: '/register',
+    name: 'Registration',
+    file: 'pages/Registration.jsx',
+    status: 'Onboarding',
+    description: 'Multi-step new user onboarding. 4 steps: personal info, KYC identity scan, OTP verification, terms acceptance. Supports Ghana, Nigeria, UK and other countries.',
+    elements: ['Step progress indicator (1 → 2 → 3 → 4)', 'Step 1: Full name / email / phone / country / date of birth', 'Step 2: ID type (NIA Ghana Card / NIMC / Passport) / ID number / 2s simulated scan animation', 'Step 3: 6-digit OTP input / Resend OTP link', 'Step 4: Terms of service checkbox / Submit', 'Back button between steps', 'Country flag + currency shown per selection', 'Navigates to /home on completion'],
+    flow: '← Splash (first launch) or invite deep link → /home',
+  },
+  {
+    route: '/settings',
+    name: 'Settings',
+    file: 'pages/Settings.jsx',
+    status: 'System',
+    description: 'Account and app settings screen. Manage notification preferences, view app meta, clear offline data. Danger zone for logout and full account deletion.',
+    elements: ['Account: Profile link / Email Notifications toggle / Auto-sync toggle / Push Notifications toggle', 'App: Version 1.0.0 / Storage Used / Language / About', 'Offline: Clear Offline Data (localStorage)', 'Danger Zone: Logout (red filled button)', 'Delete Account (red outlined button)', 'Delete confirmation modal: 2-step confirm with warning', 'OfflineSyncBanner at top if offline pending data'],
+    flow: '← NavBar "More" tab',
+  },
+];
+
+function ScreenCard({ screen }) {
+  const sc = STATUS_COLORS[screen.status] || STATUS_COLORS.System;
+  return (
+    <div style={{ border: '2px solid #E0DBC4', borderRadius: 10, overflow: 'hidden', breakInside: 'avoid', fontSize: 11, marginBottom: 4 }}>
+      <div style={{ background: '#1A1208', padding: '8px 10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+          <span style={{ color: '#EBA020', fontWeight: 800, fontSize: 12 }}>{screen.name}</span>
+          <span style={{ background: sc.bg, color: sc.color, borderRadius: 4, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{screen.status}</span>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <span style={{ color: '#C4B080', fontSize: 10, fontWeight: 700 }}>{screen.route}</span>
+          <span style={{ color: '#6B5A3A', fontSize: 10 }}>· {screen.file}</span>
+        </div>
+        <div style={{ display: 'flex', height: 2, marginTop: 5 }}>
+          {['#EBA020','#1A1208','#2D6A2D','#8B1A1A','#EBA020','#1A1208','#2D6A2D','#8B1A1A'].map((c, i) => (
+            <div key={i} style={{ flex: 1, background: c }} />
+          ))}
+        </div>
+      </div>
+      <div style={{ padding: '8px 10px', background: '#FDFAF4' }}>
+        <p style={{ fontSize: 11, color: '#3A2A10', lineHeight: 1.5, marginBottom: 6, margin: '0 0 6px 0' }}>{screen.description}</p>
+        <div style={{ marginBottom: 6 }}>
+          <div style={{ fontWeight: 700, fontSize: 10, color: '#1A1208', marginBottom: 3, textTransform: 'uppercase', letterSpacing: 0.5 }}>UI Elements & Functionality</div>
+          {screen.elements.map((el, i) => (
+            <div key={i} style={{ fontSize: 10, color: '#6B5A3A', lineHeight: 1.6, paddingLeft: 8 }}>· {el}</div>
+          ))}
+        </div>
+        <div style={{ background: '#1A1208', borderRadius: 4, padding: '4px 8px' }}>
+          <span style={{ color: '#EBA020', fontSize: 10, fontWeight: 700 }}>Navigation: </span>
+          <span style={{ color: '#C4B080', fontSize: 10 }}>{screen.flow}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HandoverDoc() {
   const contentRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
 
-  // Auto-download on mount after content renders
   useEffect(() => {
     const timer = setTimeout(() => handleDownloadPDF(), 1500);
     return () => clearTimeout(timer);
@@ -80,7 +339,6 @@ export default function HandoverDoc() {
 
   return (
     <div style={{ background: '#F7F2E8', minHeight: '100vh', paddingBottom: 60 }}>
-      {/* Download toolbar */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: '#1A1208', padding: '10px 24px',
@@ -103,7 +361,6 @@ export default function HandoverDoc() {
         </button>
       </div>
 
-      {/* Printable content */}
       <div ref={contentRef} style={S.page}>
         {/* Cover */}
         <div style={S.coverBand}>
@@ -138,6 +395,7 @@ export default function HandoverDoc() {
             '13. Key Business Logic Libraries',
             '14. GitHub Connector',
             '15. Known Gaps & Next Steps',
+            '16. Screen Gallery — Annotated UI & Functionality Breakdown',
           ].map(t => <div key={t} style={{ fontSize: 13, color: '#2D6FA8', marginBottom: 5 }}>{t}</div>)}
         </div>
 
@@ -527,6 +785,18 @@ const res = await fetch("https://api.github.com/repos/owner/repo/contents", {
             <li><span style={S.code}>entities/</span> — JSON schema definitions for all data models</li>
             <li><span style={S.code}>api/base44Client.js</span> — Pre-initialised Base44 SDK client</li>
           </ul>
+        </div>
+
+        {/* 16 — Screen Gallery */}
+        <h2 style={S.h2}>16. Screen Gallery — Annotated UI & Functionality Breakdown</h2>
+        <p style={S.p}>
+          Each card below documents a live screen in Qudi: its route, file, purpose, every UI element present, and how it connects to other screens.
+          This section serves as the visual-functional reference for the receiving agency.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
+          {SCREENS.map((screen, i) => (
+            <ScreenCard key={i} screen={screen} />
+          ))}
         </div>
 
         <div style={S.divider} />
