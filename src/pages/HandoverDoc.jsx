@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import JSZip from 'jszip';
 import { base44 } from '@/api/base44Client';
 
 const S = {
@@ -336,12 +337,20 @@ export default function HandoverDoc() {
       }
       pdf.save('Qudi-Agency-Handover-Document.pdf');
 
-      // Push to GitHub
+      // Zip the PDF then push to GitHub
       setGithubStatus('pushing');
-      const pdfBase64 = pdf.output('datauristring').split(',')[1];
+      const pdfBlob = pdf.output('blob');
+      const zip = new JSZip();
+      zip.file('Qudi-Agency-Handover.pdf', pdfBlob);
+      const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+      const zipBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(zipBlob);
+      });
       const res = await base44.functions.invoke('pushPDFToGitHub', {
-        base64Content: pdfBase64,
-        filePath: 'docs/Qudi-Agency-Handover.pdf',
+        base64Content: zipBase64,
+        filePath: 'docs/Qudi-Agency-Handover.zip',
       });
       setGithubStatus(res.data?.success ? 'done' : 'error');
     } catch (e) {
