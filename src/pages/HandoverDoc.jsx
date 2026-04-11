@@ -301,7 +301,38 @@ function ScreenCard({ screen }) {
 export default function HandoverDoc() {
   const contentRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
-  const [githubStatus, setGithubStatus] = useState(null); // null | 'pushing' | 'done' | 'error'
+  const [githubStatus, setGithubStatus] = useState(null);
+  const [downloadingWord, setDownloadingWord] = useState(false);
+
+  const handleDownloadWord = async () => {
+    setDownloadingWord(true);
+    try {
+      const html = contentRef.current.outerHTML;
+      const wordDoc = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:w="urn:schemas-microsoft-com:office:word"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="utf-8"><title>Qudi Handover Document</title>
+        <style>
+          body { font-family: 'Calibri', 'Inter', Arial, sans-serif; color: #1A1208; }
+          table { border-collapse: collapse; width: 100%; }
+          th { background: #1A1208; color: #EBA020; padding: 8px 10px; text-align: left; font-weight: 700; }
+          td { padding: 7px 10px; border-bottom: 1px solid #E0DBC4; }
+        </style>
+        </head><body>${html}</body></html>`;
+      const blob = new Blob([wordDoc], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Qudi-Agency-Handover-Document.doc';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Word export error:', e);
+    } finally {
+      setDownloadingWord(false);
+    }
+  }; // null | 'pushing' | 'done' | 'error'
 
   useEffect(() => {
     const timer = setTimeout(() => handleDownloadPDF(), 1500);
@@ -370,19 +401,34 @@ export default function HandoverDoc() {
         boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
       }}>
         <div style={{ color: '#EBA020', fontWeight: 800, fontSize: 18 }}>🫂 Qudi — Handover Doc</div>
-        <button
-          onClick={handleDownloadPDF}
-          disabled={downloading}
-          style={{
-            background: downloading ? '#856404' : '#EBA020',
-            color: '#1A1208', border: 'none', borderRadius: 8,
-            padding: '10px 24px', fontWeight: 800, fontSize: 14,
-            cursor: downloading ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}
-        >
-          {downloading ? '⏳ Generating PDF...' : githubStatus === 'pushing' ? '☁️ Pushing to GitHub...' : githubStatus === 'done' ? '✅ Saved to GitHub' : githubStatus === 'error' ? '⚠️ GitHub push failed' : '⬇ Download PDF'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={handleDownloadWord}
+            disabled={downloadingWord}
+            style={{
+              background: downloadingWord ? '#4A6FA5' : '#2D6FA8',
+              color: '#fff', border: 'none', borderRadius: 8,
+              padding: '10px 20px', fontWeight: 800, fontSize: 14,
+              cursor: downloadingWord ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}
+          >
+            {downloadingWord ? '⏳ Exporting...' : '📄 Download Word'}
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={downloading}
+            style={{
+              background: downloading ? '#856404' : '#EBA020',
+              color: '#1A1208', border: 'none', borderRadius: 8,
+              padding: '10px 20px', fontWeight: 800, fontSize: 14,
+              cursor: downloading ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}
+          >
+            {downloading ? '⏳ Generating PDF...' : githubStatus === 'pushing' ? '☁️ Pushing to GitHub...' : githubStatus === 'done' ? '✅ Saved to GitHub' : githubStatus === 'error' ? '⚠️ GitHub push failed' : '⬇ Download PDF'}
+          </button>
+        </div>
       </div>
 
       <div ref={contentRef} style={S.page}>
