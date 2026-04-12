@@ -6,6 +6,7 @@ import Header from '../components/qudi/Header';
 import KenteStripe from '../components/qudi/KenteStripe';
 import NavBar from '../components/qudi/NavBar';
 import { calcTrustScore } from '../lib/trustScore';
+import FraudMonitor from '../components/qudi/FraudMonitor';
 
 const STATUS_META = {
   open:         { label: 'Open',         bg: '#FFF8E1', color: '#856404', icon: '🔔' },
@@ -234,6 +235,8 @@ export default function DisputeDashboard() {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', paddingBottom: 80 }}>
+        <FraudMonitor onDisputeCreated={reload} />
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: 48, color: C.muted }}>Loading disputes…</div>
         ) : filtered.length === 0 ? (
