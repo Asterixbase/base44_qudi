@@ -30,6 +30,7 @@ import HandoverDoc from './pages/HandoverDoc';
 import GuarantorHealth from './pages/GuarantorHealth';
 import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 import ReconciliationPage from './pages/ReconciliationPage';
+import CircleAnalyticsPage from './pages/CircleAnalyticsPage';
 
 
 const pageVariants = {
@@ -101,6 +102,7 @@ const AuthenticatedApp = () => {
           <Route path="/guarantor-health" element={<PageSlide><GuarantorHealth /></PageSlide>} />
           <Route path="/smart-payout" element={<PageSlide><SmartPayoutScheduler /></PageSlide>} />
           <Route path="/reconciliation" element={<PageSlide><ReconciliationPage /></PageSlide>} />
+          <Route path="/circle-analytics" element={<PageSlide><CircleAnalyticsPage /></PageSlide>} />
           <Route path="/register" element={<PageSlide><Registration /></PageSlide>} />
           <Route path="/settings" element={<PageSlide><Settings /></PageSlide>} />
           <Route path="/handover" element={<HandoverDoc />} />
