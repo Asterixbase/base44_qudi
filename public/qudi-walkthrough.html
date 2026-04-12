@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Qudi — Interactive Feature Walkthrough</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --ink: #1A1208;
+    --cream: #F7F2E8;
+    --gold: #EBA020;
+    --goldText: #B8860B;
+    --white: #FFFFFF;
+    --border: #E0DBC4;
+    --muted: #6B5A3A;
+    --hint: #C4B080;
+    --green: #1B7A3A;
+    --greenBg: #D4EDDA;
+    --red: #C0392B;
+    --redBg: #FCE4E4;
+    --amber: #8A5C00;
+    --amberBg: #FFF8E1;
+    --teal: #008B94;
+    --tealBg: #D1ECF1;
+    --forest: #2D6A2D;
+    --crimson: #8B1A1A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--ink);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  /* ─── TOP NAV ─── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink);
+    border-bottom: 2px solid var(--gold);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .top-nav .logo { font-size: 22px; font-weight: 800; color: var(--gold); }
+  .top-nav .logo span { color: var(--cream); font-weight: 400; font-size: 14px; margin-left: 8px; }
+  .progress-bar { height: 4px; background: var(--gold); transition: width 0.4s; }
+
+  /* ─── KENTE ─── */
+  .kente { display: flex; height: 4px; width: 100%; flex-shrink: 0; }
+  .kente div { flex: 1; }
+
+  /* ─── LAYOUT ─── */
+  .shell {
+    display: grid;
+    grid-template-columns: 280px 1fr 340px;
+    height: calc(100vh - 54px);
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: #120E06;
+    border-right: 1px solid rgba(235,160,32,0.2);
+    overflow-y: auto;
+    padding: 16px 0;
+  }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 700; color: var(--hint);
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 12px 16px 6px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s; font-size: 13px; color: var(--hint);
+  }
+  .sidebar-item:hover { background: rgba(235,160,32,0.07); color: var(--cream); }
+  .sidebar-item.active { border-left-color: var(--gold); background: rgba(235,160,32,0.12); color: var(--gold); font-weight: 700; }
+  .sidebar-item .icon { font-size: 16px; width: 22px; text-align: center; }
+
+  /* Main content */
+  .main {
+    overflow-y: auto;
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  /* Panel */
+  .panel {
+    overflow-y: auto;
+    background: #0E0A04;
+    border-left: 1px solid rgba(235,160,32,0.2);
+    padding: 20px;
+  }
+  .panel h3 { color: var(--gold); font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+  .panel p { color: var(--hint); font-size: 12px; line-height: 1.7; margin-bottom: 10px; }
+  .panel .tag { display: inline-block; background: rgba(235,160,32,0.15); color: var(--gold); border-radius: 5px; padding: 2px 8px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .panel .feature-list { margin: 8px 0 14px; padding-left: 16px; }
+  .panel .feature-list li { color: var(--hint); font-size: 12px; line-height: 1.8; }
+
+  /* Screen viewer */
+  .screen-header {
+    background: var(--ink);
+    padding: 0;
+  }
+  .screen-header .s-inner { padding: 14px 16px 12px; display: flex; align-items: center; gap: 12px; }
+  .screen-header .back { color: var(--cream); font-size: 20px; cursor: pointer; background: none; border: none; }
+  .screen-header .title { color: var(--cream); font-weight: 700; font-size: 17px; }
+  .screen-header .sub { color: var(--hint); font-size: 12px; }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .card-header { background: var(--ink); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .card-header .ch-title { color: var(--gold); font-weight: 800; font-size: 13px; }
+  .card-header .ch-sub { color: var(--hint); font-size: 11px; }
+  .card-body { padding: 12px 14px; }
+
+  /* Chips */
+  .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; }
+  .chip-green { background: var(--greenBg); color: var(--green); }
+  .chip-amber { background: var(--amberBg); color: var(--amber); }
+  .chip-red   { background: var(--redBg);   color: var(--red); }
+  .chip-teal  { background: var(--tealBg);  color: var(--teal); }
+  .chip-ink   { background: var(--ink);     color: var(--gold); }
+
+  /* Avatar */
+  .av { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; }
+  .av-sm { width: 30px; height: 30px; font-size: 10px; }
+
+  /* Rows */
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row-between { display: flex; align-items: center; justify-content: space-between; }
+
+  /* Buttons */
+  .btn-gold { background: var(--gold); color: var(--ink); border: none; border-radius: 10px; padding: 11px 18px; font-weight: 800; font-size: 13px; cursor: pointer; width: 100%; }
+  .btn-outline { background: transparent; color: var(--goldText); border: 1.5px solid var(--goldText); border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+  /* Trust bar */
+  .trust-bar { height: 4px; border-radius: 2px; background: #eee; overflow: hidden; margin-top: 4px; }
+  .trust-fill { height: 100%; border-radius: 2px; }
+
+  /* Bottom nav mock */
+  .bottom-nav { border-top: 1px solid var(--border); background: var(--white); display: flex; }
+  .bottom-nav a { flex: 1; text-align: center; padding: 10px 4px 8px; font-size: 10px; color: var(--muted); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .bottom-nav a.active { color: var(--goldText); font-weight: 700; }
+  .bottom-nav a span { font-size: 16px; }
+
+  /* Nav controls */
+  .nav-controls { display: flex; align-items: center; gap: 8px; }
+  .nav-btn { background: rgba(235,160,32,0.15); color: var(--gold); border: 1px solid rgba(235,160,32,0.3); border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .nav-btn:hover { background: var(--gold); color: var(--ink); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Section divider */
+  .section-divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  /* Mobile phone wrapper */
+  .phone-wrap {
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 20px; background: var(--cream); min-height: 100%;
+  }
+  .phone {
+    width: 100%; max-width: 390px;
+    background: var(--white);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    min-height: 600px;
+    display: flex; flex-direction: column;
+  }
+
+  /* Screen panels hidden/shown */
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; }
+
+  /* Stat box */
+  .stat-box { background: var(--ink); border-radius: 12px; padding: 12px 14px; text-align: center; }
+  .stat-box .val { font-size: 20px; font-weight: 800; color: var(--gold); }
+  .stat-box .lbl { font-size: 10px; color: var(--hint); margin-top: 2px; }
+
+  /* Input mock */
+  .input-mock { background: #F5F0E8; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--muted); width: 100%; margin-bottom: 8px; }
+
+  /* Progress */
+  .prog { height: 6px; border-radius: 3px; background: #eee; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 3px; background: var(--gold); }
+
+  /* Timeline dot */
+  .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .timeline-line { width: 2px; background: var(--border); flex: 1; min-height: 20px; }
+
+  /* Scrollable inner content */
+  .scroll-inner { overflow-y: auto; flex: 1; padding: 12px 14px; }
+
+  /* Tooltip for features */
+  .feature-badge { background: rgba(27,122,58,0.12); color: var(--green); border: 1px solid rgba(27,122,58,0.3); border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 700; display: inline-block; margin: 3px; }
+  .feature-badge.new { background: rgba(235,160,32,0.12); color: var(--goldText); border-color: rgba(235,160,32,0.3); }
+
+  /* Highlight box in panel */
+  .highlight-box { background: rgba(235,160,32,0.08); border: 1px solid rgba(235,160,32,0.25); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .highlight-box .hb-title { color: var(--gold); font-weight: 800; font-size: 13px; margin-bottom: 6px; }
+
+  /* Step indicator */
+  .steps { display: flex; gap: 6px; margin-bottom: 14px; }
+  .step { flex: 1; height: 4px; border-radius: 2px; background: rgba(235,160,32,0.2); }
+  .step.done { background: var(--gold); }
+
+  /* Gantt bar */
+  .gantt-bar { height: 18px; border-radius: 4px; background: var(--gold); display: flex; align-items: center; padding: 0 6px; font-size: 10px; color: var(--ink); font-weight: 700; }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar, .panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="logo">🫂 Qudi <span>Interactive Feature Walkthrough</span></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">← Prev</button>
+    <span style="color:var(--hint);font-size:12px;" id="pageCounter">1 / 20</span>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+<div class="progress-bar" id="progressBar" style="width:5%"></div>
+
+<!-- MAIN SHELL -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar"></div>
+
+  <!-- PHONE VIEWER -->
+  <div class="main">
+    <div class="phone-wrap">
+      <div class="phone" id="phoneFrame"></div>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel" id="descPanel">
+    <h3 id="panelTitle">Feature Overview</h3>
+    <div id="panelContent"></div>
+  </div>
+
+</div>
+
+<script>
+const KENTE_COLORS = ['#EBA020','#1A1208','#2D6A2D','#8B1A1A','#EBA020','#1A1208','#2D6A2D','#8B1A1A'];
+function kente(h=3){ return `<div class="kente">${KENTE_COLORS.map(c=>`<div style="background:${c}"></div>`).join('')}</div>`; }
+
+const SCREENS = [
+  // ── 0 Splash ──
+  {
+    label: 'Splash Screen', icon: '🌟', section: 'Onboarding',
+    html: () => `
+      <div style="background:#1A1208;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center">
+        <div style="font-size:64px;margin-bottom:16px">🫂</div>
+        <div style="font-size:36px;font-weight:800;color:#EBA020;letter-spacing:-1px">Qudi</div>
+        <div style="color:#C4B080;font-size:14px;margin-top:6px">Money Circles, Built on Trust</div>
+        <div style="margin-top:40px">
+          <div style="width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div>
+        </div>
+        <div style="color:#6B5A3A;font-size:12px;margin-top:16px">Checking authentication…</div>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`,
+    title: 'Splash & Authentication',
+    desc: `The entry point of Qudi. On launch, the app displays a branded splash screen while silently checking whether the user is already authenticated.`,
+    features: ['Auto-redirects authenticated users to Home dashboard','Unauthenticated users are sent to the platform login','1.5s branded animation with Qudi logo','No manual login page — platform-managed auth (magic link)'],
+    tags: ['Auth','Entry Point','Auto-redirect']
+  },
+
+  // ── 1 Registration ──
+  {
+    label: 'Registration', icon: '📝', section: 'Onboarding',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><span class="title" style="color:#EBA020">Create Account</span></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div class="steps"><div class="step done"></div><div class="step done"></div><div class="step"></div><div class="step"></div></div>
+        <div style="font-weight:800;font-size:15px;margin-bottom:4px">Step 2: Identity Verification</div>
+        <div style="font-size:12px;color:#6B5A3A;margin-bottom:16px">Select your ID type and enter details</div>
+        <div style="background:#1A1208;border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="color:#EBA020;font-weight:700;font-size:12px;margin-bottom:10px">🇬🇭 Ghana NIA Card</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="chip chip-green">✓ Ghana NIA Card</span>
+            <span class="chip chip-amber">NIMC Nigeria</span>
+            <span class="chip chip-teal">Passport</span>
+          </div>
+        </div>
+        <input class="input-mock" placeholder="GHA-000000000-0" value="GHA-198432211-5" />
+        <div style="background:#fff;border-radius:12px;border:1.5px dashed #E0DBC4;padding:20px;text-align:center;margin-bottom:12px">
+          <div style="font-size:28px">📷</div>
+          <div style="font-size:12px;font-weight:700;margin-top:6px">Scanning ID…</div>
+          <div class="prog" style="margin-top:10px"><div class="prog-fill" style="width:65%"></div></div>
+        </div>
+        <button class="btn-gold">Continue to OTP Verification →</button>
+      </div>`,
+    title: 'Member Registration & KYC',
+    desc: `Multi-step onboarding wizard that guides new users through personal details, identity verification, phone OTP, and terms acceptance.`,
+    features: ['4-step wizard: Personal Info → KYC Scan → OTP → Terms','Supports Ghana NIA Card, NIMC (Nigeria), and Passport','Animated 2-second ID scan simulation','6-digit OTP with resend option','Country selector with currency context (GHS, NGN, GBP)'],
+    tags: ['KYC','Onboarding','Multi-step','OTP']
+  },
+
+  // ── 2 Home ──
+  {
+    label: 'Home Dashboard', icon: '🏠', section: 'Core',
+    html: () => `
+      <div style="background:#1A1208;padding:14px 14px 0">
+        <div class="row-between" style="margin-bottom:10px">
+          <div>
+            <div style="color:#EBA020;font-weight:800;font-size:18px">Good morning 👋</div>
+            <div style="color:#C4B080;font-size:12px">Your money circles</div>
+          </div>
+          <div class="av" style="background:#EBA020;color:#1A1208">KA</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div class="stat-box"><div class="val">GHS 14,200</div><div class="lbl">Total Pot Balance</div></div>
+          <div class="stat-box"><div class="val">3</div><div class="lbl">Active Circles</div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button style="flex:1;background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:8px;font-size:11px;font-weight:700">+ New Circle</button>
+          <button style="flex:1;background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:8px;font-size:11px;font-weight:700">🤝 Join Circle</button>
+          <button style="flex:1;background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:8px;font-size:11px;font-weight:700">📊 Reports</button>
+        </div>
+      </div>
+      ${kente(3)}
+      <div class="scroll-inner" style="background:#F7F2E8">
+        ${[
+          {name:'Adom Susu Circle',status:'active',freq:'Monthly · GHS 500',pot:'GHS 5,000',cycle:'Cycle 4',insured:true,col:'#1B7A3A'},
+          {name:'Accra Women\'s Tontine',status:'active',freq:'Weekly · GHS 200',pot:'GHS 4,200',cycle:'Cycle 7',insured:false,col:'#008B94'},
+          {name:'Diaspora GBP Circle',status:'forming',freq:'Monthly · GBP 100',pot:'GHS 5,000',cycle:'Forming',insured:true,col:'#8A5C00'},
+        ].map(c=>`
+          <div class="card" style="cursor:pointer">
+            <div class="card-header">
+              <span class="ch-title">${c.name}</span>
+              <span class="chip" style="background:${c.col}22;color:${c.col};font-size:10px">${c.status}</span>
+            </div>
+            <div class="card-body">
+              <div class="row-between">
+                <div><div style="font-size:11px;color:#6B5A3A">${c.freq}</div><div style="font-weight:800;font-size:16px;color:#1A1208;margin-top:2px">${c.pot}</div></div>
+                <div style="text-align:right"><div style="font-size:10px;color:#6B5A3A">${c.cycle}</div>${c.insured?'<span class="chip chip-teal" style="margin-top:4px">🛡 Insured</span>':''}</div>
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="bottom-nav">
+        <a href="#" class="active"><span>⌂</span>Home</a>
+        <a href="#"><span>◎</span>Circles</a>
+        <a href="#"><span>🔔</span>Reminders</a>
+        <a href="#"><span>🚨</span>Alerts</a>
+        <a href="#"><span>···</span>More</a>
+      </div>`,
+    title: 'Home Dashboard',
+    desc: `The central hub where organisers see all their active money circles at a glance, with real-time pot balances, cycle positions, and quick-action buttons.`,
+    features: ['Total escrow balance across all circles','Active circle count summary','Quick actions: New Circle, Join Circle, Reports','Circle cards with status badge, frequency, pot balance, cycle number','Insurance badge on protected circles','Pull-to-refresh syncs live DB data','Bottom navigation bar for all major sections'],
+    tags: ['Dashboard','Overview','Real-time','Navigation']
+  },
+
+  // ── 3 Circle Detail ──
+  {
+    label: 'Circle Detail', icon: '◎', section: 'Core',
+    html: () => `
+      <div class="screen-header">
+        <div class="s-inner"><button class="back">←</button><div><div class="title">Adom Susu Circle</div><div class="sub">Cycle 4 · GHS 5,000 pot</div></div></div>
+        ${kente()}
+      </div>
+      <div style="background:#1A1208;padding:10px 14px;display:flex;gap:6px;overflow-x:auto">
+        <button style="background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap">💰 Collect Dues</button>
+        <button style="background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap">🚀 Payout</button>
+        <button style="background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap">🗺 Roadmap</button>
+        <button style="background:rgba(235,160,32,0.2);color:#EBA020;border:1px solid rgba(235,160,32,0.4);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;white-space:nowrap">+ Invite</button>
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="background:#FCE4E4;border:1px solid #C0392B;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#721C24;font-weight:600">⚠️ Kofi Mensah is 3 days overdue — penalty applies</div>
+        <div style="font-weight:700;font-size:12px;color:#6B5A3A;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Members (6)</div>
+        ${[
+          {n:'Ama Owusu',i:'AO',s:'paid',t:85},{n:'Kwame Boateng',i:'KB',s:'paid',t:76},
+          {n:'Kofi Mensah',i:'KM',s:'overdue',t:42},{n:'Abena Frimpong',i:'AF',s:'pending',t:61},
+          {n:'Yaw Darko',i:'YD',s:'paid',t:90},{n:'Efua Asante',i:'EA',s:'pending',t:55},
+        ].map(m=>{
+          const cs={paid:{bg:'#D4EDDA',c:'#155724',lbl:'✅ Paid'},overdue:{bg:'#FCE4E4',c:'#721C24',lbl:'🔴 Overdue'},pending:{bg:'#FFF8E1',c:'#856404',lbl:'⏳ Pending'}};
+          const s=cs[m.s];
+          return `<div class="card" style="cursor:pointer">
+            <div class="card-body">
+              <div class="row-between">
+                <div class="row"><div class="av">${m.i}</div><div><div style="font-weight:700;font-size:13px">${m.n}</div><div class="trust-bar" style="width:70px"><div class="trust-fill" style="width:${m.t}%;background:${m.t>70?'#1B7A3A':m.t>40?'#EBA020':'#C0392B'}"></div></div></div></div>
+                <div style="text-align:right">
+                  <span class="chip" style="background:${s.bg};color:${s.c}">${s.lbl}</span>
+                  <div style="margin-top:4px;display:flex;gap:4px;justify-content:flex-end">
+                    <button style="background:none;border:1px solid #E0DBC4;border-radius:6px;padding:2px 8px;font-size:10px;cursor:pointer">Profile</button>
+                    <button style="background:none;border:1px solid #C0392B;border-radius:6px;padding:2px 8px;font-size:10px;color:#C0392B;cursor:pointer">🚩</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;}).join('')}
+      </div>`,
+    title: 'Circle Detail Hub',
+    desc: `The management centre for a single circle. Organisers can see every member's payment status, trust score, initiate collections or payouts, and take action on overdue members.`,
+    features: ['Live member grid with payment status chips (Paid/Pending/Failed/Overdue)','Trust score progress bar per member','Overdue penalty banner auto-triggered','Quick-action bar: Collect, Payout, Roadmap, Invite, Penalties','Tap member → mark as paid (manual)','🚩 Flag button → opens dispute modal','Analytics and PDF circle summary download'],
+    tags: ['Core','Members','Disputes','Trust Score','Penalties']
+  },
+
+  // ── 4 Collect Dues ──
+  {
+    label: 'Collect Dues', icon: '💰', section: 'Core',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Collect Dues</div><div class="sub">Adom Susu Circle · Cycle 4</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div class="stat-box"><div class="val" style="font-size:16px">4</div><div class="lbl">Sent</div></div>
+        <div class="stat-box"><div class="val" style="font-size:16px;color:#1B7A3A">3</div><div class="lbl">Confirmed</div></div>
+        <div class="stat-box"><div class="val" style="font-size:16px;color:#C0392B">1</div><div class="lbl">Failed</div></div>
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        ${[
+          {n:'Ama Owusu',p:'0244 123 456',s:'confirmed',t:'high'},{n:'Kwame Boateng',p:'0201 987 654',s:'confirmed',t:'high'},
+          {n:'Kofi Mensah',p:'0271 456 789',s:'failed',t:'low'},{n:'Abena Frimpong',p:'0244 321 987',s:'confirmed',t:'med'},
+          {n:'Yaw Darko',p:'0209 654 321',s:'pending',t:'high'},{n:'Efua Asante',p:'0244 789 012',s:'pending',t:'med'},
+        ].map(m=>{
+          const cs={confirmed:{bg:'#D4EDDA',c:'#155724',lbl:'✅ Confirmed'},failed:{bg:'#FCE4E4',c:'#721C24',lbl:'❌ Failed'},pending:{bg:'#FFF8E1',c:'#856404',lbl:'⏳ Pending'}};
+          const tc={high:'#1B7A3A',med:'#EBA020',low:'#C0392B'};
+          const s=cs[m.s];
+          return `<div class="card"><div class="card-body"><div class="row-between">
+            <div class="row"><div class="av">${m.n.split(' ').map(x=>x[0]).join('')}</div><div><div style="font-weight:700;font-size:13px">${m.n}</div><div style="font-size:11px;color:#6B5A3A">${m.p}</div></div></div>
+            <div style="text-align:right"><span class="chip" style="background:${s.bg};color:${s.c}">${s.lbl}</span><div style="font-size:10px;color:${tc[m.t]};margin-top:3px">● ${m.t} risk</div></div>
+          </div></div></div>`;}).join('')}
+        <button class="btn-gold" style="margin-top:8px">🔐 Authorise with PIN</button>
+      </div>`,
+    title: 'Live MoMo Due Collection',
+    desc: `Organiser reviews member risk profiles then sends bulk MTN Mobile Money payment requests. A 4-digit PIN is required to authorise the batch. Real-time counters update as responses arrive.`,
+    features: ['Per-member risk indicator (green/amber/red based on trust score)','Live tracker: Sent / Confirmed / Failed counts','PIN confirmation overlay before bulk dispatch','MoMo phone number shown per member','Transaction records saved to database automatically','Collection result updates member payment_status in real time'],
+    tags: ['MoMo','PIN Auth','Real-time','Collections','MTN']
+  },
+
+  // ── 5 Payout Scheduler ──
+  {
+    label: 'Payout Scheduler', icon: '🚀', section: 'Core',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Payout Scheduler</div><div class="sub">Select circle & trigger payout</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+          ${['Random','Fixed','Rotation','Bid'].map((m,i)=>`<span class="chip ${i===2?'chip-ink':'chip-amber'}" style="cursor:pointer">${m}</span>`).join('')}
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-header"><span class="ch-title">Next Payout Recipient</span><span class="chip chip-teal">Position #3</span></div>
+          <div class="card-body">
+            <div class="row" style="gap:12px">
+              <div class="av" style="width:50px;height:50px;font-size:16px;background:#EBA020;color:#1A1208">KM</div>
+              <div><div style="font-weight:800;font-size:16px">Kofi Mensah</div><div style="color:#6B5A3A;font-size:12px">0271 456 789</div><div style="font-weight:800;font-size:20px;color:#1A1208;margin-top:4px">GHS 3,000</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-weight:700;font-size:12px;color:#6B5A3A;margin-bottom:8px">Full Queue</div>
+        ${[
+          {n:'Yaw Darko',pos:1,done:true},{n:'Ama Owusu',pos:2,done:true},{n:'Kofi Mensah',pos:3,done:false,next:true},
+          {n:'Abena Frimpong',pos:4,done:false},{n:'Kwame Boateng',pos:5,done:false},{n:'Efua Asante',pos:6,done:false},
+        ].map(m=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #E0DBC4">
+          <div style="width:24px;height:24px;border-radius:50%;background:${m.done?'#D4EDDA':m.next?'#EBA020':'#F5F0E8'};color:${m.done?'#155724':m.next?'#1A1208':'#6B5A3A'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${m.pos}</div>
+          <div style="flex:1;font-weight:600;font-size:13px;color:${m.done?'#aaa':'#1A1208'};text-decoration:${m.done?'line-through':'none'}">${m.n}</div>
+          ${m.done?'<span class="chip chip-green" style="font-size:10px">✓ Paid</span>':m.next?'<span class="chip chip-ink" style="font-size:10px">→ Next</span>':''}
+        </div>`).join('')}
+        <button class="btn-gold" style="margin-top:14px">🚀 Initiate Payout to Kofi</button>
+      </div>`,
+    title: 'Payout Scheduler',
+    desc: `Manages the payout queue with 4 ordering modes. The organiser reviews the sequence, sees who's next, and triggers the disbursement — which updates the DB and sends MoMo transfer.`,
+    features: ['4 payout order modes: Random, Fixed, Rotation, Bid','Bid mode: members enter bid amounts to move up the queue','Visual payout queue with completed members greyed out','Next recipient highlighted with gold border','Progress: X of Y members paid this cycle','Triggers MoMo disbursement via backend function'],
+    tags: ['Payout','MoMo','Queue','Scheduling','Bid']
+  },
+
+  // ── 6 Payout Timeline ──
+  {
+    label: 'Payout Timeline', icon: '📅', section: 'Core',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Payout Timeline</div><div class="sub">Drag to reorder · 6-month view</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:8px 14px 12px;display:flex;gap:8px">
+        <div style="flex:1;background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 10px;color:#EBA020;font-size:12px;font-weight:700">Adom Susu Circle ▾</div>
+        <div style="display:flex;background:rgba(255,255,255,0.08);border-radius:8px;overflow:hidden">
+          <button style="background:#EBA020;color:#1A1208;border:none;padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer">📊</button>
+          <button style="background:none;color:#EBA020;border:none;padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer">📅</button>
+        </div>
+      </div>
+      <div style="margin:10px 14px;background:#fff;border-radius:12px;padding:12px;border:1px solid #E0DBC4">
+        <div style="font-size:11px;font-weight:700;color:#6B5A3A;text-transform:uppercase;margin-bottom:8px">Pot Balance Trajectory</div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:40px">
+          ${[35,45,28,52,38,42].map(h=>`<div style="flex:1;background:#EBA020;border-radius:2px 2px 0 0;height:${h}px;opacity:0.8"></div>`).join('')}
+        </div>
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="font-size:11px;color:#6B5A3A;margin-bottom:8px">☝️ Drag members to reorder payout sequence</div>
+        ${[
+          {n:'Kofi Mensah',cycle:4,date:'15 May 2026',amt:'GHS 3,000',health:'good'},
+          {n:'Abena Frimpong',cycle:5,date:'15 Jun 2026',amt:'GHS 3,000',health:'ok'},
+          {n:'Yaw Darko',cycle:6,date:'15 Jul 2026',amt:'GHS 3,000',health:'good'},
+        ].map((e,i)=>`
+          <div style="background:#fff;border:1.5px solid #E0DBC4;border-radius:12px;margin-bottom:8px;overflow:hidden">
+            <div style="background:#1A1208;padding:5px 12px;display:flex;justify-content:space-between">
+              <span style="color:#EBA020;font-size:11px;font-weight:700">Cycle ${e.cycle}</span>
+              <span style="color:#C4B080;font-size:11px">${e.date}</span>
+            </div>
+            <div style="padding:10px 12px;display:flex;align-items:center;gap:10px">
+              <span style="font-size:18px;color:#aaa;cursor:grab">⠿</span>
+              <div class="av">${e.n.split(' ').map(x=>x[0]).join('')}</div>
+              <div style="flex:1"><div style="font-weight:700;font-size:13px">${e.n}</div><div style="font-size:11px;color:#6B5A3A">Position #${i+1}</div></div>
+              <div style="text-align:right"><div style="font-weight:800;color:#B8860B">${e.amt}</div><span class="chip chip-green" style="font-size:10px;margin-top:3px">🟢 Reliable</span></div>
+            </div>
+          </div>`).join('')}
+      </div>`,
+    title: 'Interactive Payout Timeline',
+    desc: `A visual 6-month Gantt/calendar view of all upcoming payouts. Organisers can drag-and-drop to reorder the sequence with pot balance recalculated in real time.`,
+    features: ['Gantt view: drag-and-drop cards to reorder sequence','Calendar view: month-grouped day badges','Real-time pot trajectory bar chart','Health indicators: Reliable/Moderate/At Risk per member','Pot balance after each payout shown inline','Save Order persists payout_position to database'],
+    tags: ['Gantt','Calendar','Drag & Drop','Projections','Visual']
+  },
+
+  // ── 7 Invite System ──
+  {
+    label: 'Invite System', icon: '🤝', section: 'Core',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Invite Members</div><div class="sub">Adom Susu Circle</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:0">
+        ${[{v:4,l:'Sent'},{v:2,l:'Joined'},{v:1,l:'Pending'},{v:1,l:'Expired'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:16px">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Create Invitation</span></div>
+          <div class="card-body">
+            <input class="input-mock" placeholder="Invitee Name" value="Grace Osei" />
+            <input class="input-mock" placeholder="Phone Number" value="0244 567 890" />
+            <input class="input-mock" placeholder="Email (optional)" value="grace@example.com" />
+            <div style="background:#F5F0E8;border-radius:8px;padding:10px;margin-top:4px">
+              <div style="font-size:11px;font-weight:700;color:#6B5A3A;margin-bottom:6px">Guarantor (optional)</div>
+              <input class="input-mock" placeholder="Guarantor Name" value="Joseph Osei" />
+            </div>
+            <button class="btn-gold" style="margin-top:8px">Generate Invite Link 🔗</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:11px;font-weight:700;color:#6B5A3A">Generated Invite Code</div>
+            <div style="font-size:18px;font-weight:800;letter-spacing:3px;color:#1A1208;margin:6px 0">QUDI-7X4K2</div>
+            <div style="font-size:11px;color:#6B5A3A;background:#F5F0E8;border-radius:6px;padding:6px 8px;word-break:break-all">https://qudi.app/join?code=QUDI-7X4K2</div>
+            <button style="width:100%;margin-top:8px;background:none;border:1.5px solid #B8860B;color:#B8860B;border-radius:8px;padding:8px;font-weight:700;font-size:12px">📋 Copy Link</button>
+          </div>
+        </div>
+      </div>`,
+    title: 'Smart Invite System',
+    desc: `Organisers generate personalised deep-link invitations for prospective members. Each invite has a unique code, optional guarantor linkage, and simulated SMS dispatch.`,
+    features: ['Generate unique invite code + deep link URL','Track status: pending → viewed → joined → expired','Guarantor name and phone linked to invite','Simulated SMS log with message preview','Invite stats: Sent / Joined / Pending / Expired counts','Expiry date configurable per invite'],
+    tags: ['Invites','Deep Links','Guarantor','SMS','Onboarding']
+  },
+
+  // ── 8 Member Profile ──
+  {
+    label: 'Member Profile', icon: '👤', section: 'Members',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Member Profile</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:20px 14px;text-align:center">
+        <div class="av" style="width:70px;height:70px;font-size:22px;margin:0 auto 10px;background:#EBA020;color:#1A1208">KM</div>
+        <div style="color:#EBA020;font-weight:800;font-size:18px">Kofi Mensah</div>
+        <div style="color:#C4B080;font-size:13px;margin-top:4px">0271 456 789</div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px">
+          <span class="chip chip-amber">⚠️ Building Trust</span>
+          <span style="background:rgba(255,255,255,0.1);color:#C4B080;border-radius:6px;padding:3px 8px;font-size:11px">❌ KYC Pending</span>
+        </div>
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          ${[{v:'GHS 2,500',l:'Total Paid'},{v:'2',l:'Missed'},{v:'1',l:'Overdue Now'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:14px">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Trust Score</span><span style="color:#EBA020;font-weight:800;font-size:16px">42 / 100</span></div>
+          <div class="card-body">
+            <div class="prog"><div class="prog-fill" style="width:42%;background:#EBA020"></div></div>
+            <div style="font-size:11px;color:#6B5A3A;margin-top:6px">Score affected by 2 late payments in the last 3 cycles</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div style="font-weight:700;font-size:12px;margin-bottom:6px">Guarantor</div>
+            <div class="row"><div class="av av-sm">GO</div><div style="margin-left:8px"><div style="font-weight:600;font-size:13px">George Owusu</div><div style="font-size:11px;color:#6B5A3A">0209 876 543</div></div></div>
+          </div>
+        </div>
+        <button class="btn-gold">📋 View Full Contribution History</button>
+      </div>`,
+    title: 'Member Profile',
+    desc: `Individual member deep-dive showing KYC status, trust score tier, payment summary, and linked guarantor details.`,
+    features: ['Trust score (0–100) with tier: Trusted / Verified / Building / New','KYC verification badge (verified or pending)','Summary stats: total paid, missed count, currently overdue','Guarantor name and phone number','Payment position in payout queue','Link to full contribution history timeline'],
+    tags: ['Trust Score','KYC','Guarantor','Profile','Member']
+  },
+
+  // ── 9 Penalty System ──
+  {
+    label: 'Penalty Engine', icon: '⚡', section: 'Finance',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Penalty Settings</div><div class="sub">Adom Susu Circle</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Penalty Rules</span><span class="chip chip-green">Enabled</span></div>
+          <div class="card-body">
+            <div style="font-size:12px;font-weight:700;margin-bottom:10px">Penalty Type</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+              ${[{l:'Flat Fee',sel:false},{l:'% of Contribution',sel:true},{l:'Daily Interest',sel:false}].map(o=>`
+                <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${o.sel?'#1A1208':'#F5F0E8'};border-radius:8px;border:1.5px solid ${o.sel?'#EBA020':'#E0DBC4'};cursor:pointer">
+                  <div style="width:16px;height:16px;border-radius:50%;background:${o.sel?'#EBA020':'#ddd'};flex-shrink:0"></div>
+                  <span style="font-weight:600;font-size:13px;color:${o.sel?'#EBA020':'#1A1208'}">${o.l}</span>
+                </label>`).join('')}
+            </div>
+            <input class="input-mock" placeholder="Penalty %" value="5%" />
+            <input class="input-mock" placeholder="Grace Period (days)" value="3" />
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #E0DBC4;margin-top:4px">
+              <span style="font-weight:600;font-size:13px">Notify Guarantor</span>
+              <div style="width:44px;height:24px;background:#1B7A3A;border-radius:12px;display:flex;align-items:center;padding:0 4px;justify-content:flex-end"><div style="width:18px;height:18px;background:#fff;border-radius:50%"></div></div>
+            </div>
+            <button class="btn-gold">Save Penalty Rules</button>
+          </div>
+        </div>
+      </div>`,
+    title: 'Penalty Engine',
+    desc: `Flexible, per-circle penalty configuration. Supports three penalty models with configurable grace periods and automatic guarantor notifications.`,
+    features: ['3 penalty models: Flat Fee, % of Contribution, Daily Interest Rate','Grace period (days) before penalty kicks in','Guarantor auto-notification toggle','Penalties tracked in PenaltyLedger entity','Auto-scan button checks all overdue members','Settlement methods: payout deduction, manual payment, or waived'],
+    tags: ['Penalties','Ledger','Guarantor','Auto-trigger','Finance']
+  },
+
+  // ── 10 Disputes ──
+  {
+    label: 'Dispute Dashboard', icon: '🚩', section: 'Governance',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Dispute Dashboard</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        ${[{v:3,l:'Open',c:'#C0392B'},{v:1,l:'Escrow',c:'#EBA020'},{v:5,l:'Resolved',c:'#1B7A3A'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:16px;color:${s.c}">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        ${[
+          {n:'Kofi Mensah',type:'Payment Status',status:'open',amt:'GHS 500'},
+          {n:'Abena Frimpong',type:'Suspicious Transaction',status:'escrow_held',amt:'GHS 1,200'},
+          {n:'Yaw Darko',type:'Missed Payout',status:'under_review',amt:'GHS 3,000'},
+        ].map(d=>{
+          const sc={open:{bg:'#FCE4E4',c:'#721C24',l:'Open'},escrow_held:{bg:'#FFF8E1',c:'#856404',l:'💰 Escrow Held'},under_review:{bg:'#D1ECF1',c:'#0C5460',l:'Under Review'}};
+          const s=sc[d.status];
+          return `<div class="card">
+            <div class="card-header"><span class="ch-title">${d.n}</span><span class="chip" style="background:${s.bg};color:${s.c};font-size:10px">${s.l}</span></div>
+            <div class="card-body">
+              <div class="row-between">
+                <div><span class="chip chip-amber" style="font-size:10px">${d.type}</span><div style="font-weight:800;font-size:15px;color:#1A1208;margin-top:6px">${d.amt}</div></div>
+                <div style="display:flex;gap:6px;flex-direction:column">
+                  <button style="background:#D4EDDA;color:#155724;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">✓ Resolve</button>
+                  <button style="background:#FCE4E4;color:#721C24;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">✗ Reject</button>
+                </div>
+              </div>
+            </div>
+          </div>`;}).join('')}
+      </div>`,
+    title: 'Dispute Dashboard',
+    desc: `Full dispute lifecycle management. Organisers can hold funds in escrow while investigating, add notes, and resolve or reject with a single tap.`,
+    features: ['Dispute types: Payment Status, Suspicious Transaction, Missed Payout','Status workflow: Open → Under Review → Escrow Held → Resolved/Rejected','Escrow toggle: funds held pending investigation','Organiser notes with timestamp','Proof of payment URL field for evidence','AI fraud monitor analyses member payment patterns'],
+    tags: ['Disputes','Escrow','Governance','AI','Fraud']
+  },
+
+  // ── 11 Cash Flow Forecast ──
+  {
+    label: 'Cash Flow Forecast', icon: '📈', section: 'Analytics',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Cash Flow Forecast</div><div class="sub">AI-assisted projections</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0">
+        ${[{v:'3',l:'Active Circles'},{v:'2',l:'Healthy'},{v:'1',l:'At Risk'},{v:'4',l:'Cycles Ahead'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:14px">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Projected Collections — Next 4 Cycles</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:70px;margin-bottom:8px">
+              ${[{h:85,l:'C4'},{h:72,l:'C5'},{h:90,l:'C6'},{h:60,l:'C7'}].map(b=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+                <div style="font-size:9px;color:#6B5A3A">${Math.round(b.h*35)}GHS</div>
+                <div style="width:100%;background:${b.h>75?'#1B7A3A':'#EBA020'};border-radius:3px 3px 0 0;height:${b.h*0.7}px;min-height:4px"></div>
+                <div style="font-size:10px;color:#6B5A3A">${b.l}</div>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Member Reliability</span></div>
+          <div class="card-body">
+            ${[{n:'Ama Owusu',s:92,ok:true},{n:'Kwame Boateng',s:78,ok:true},{n:'Kofi Mensah',s:42,ok:false},{n:'Efua Asante',s:55,ok:false}].map(m=>`
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <div class="av av-sm">${m.n.split(' ').map(x=>x[0]).join('')}</div>
+                <div style="flex:1"><div style="font-size:12px;font-weight:600">${m.n}</div><div class="prog" style="margin-top:3px"><div class="prog-fill" style="width:${m.s}%;background:${m.ok?'#1B7A3A':'#EBA020'}"></div></div></div>
+                <span class="chip ${m.ok?'chip-green':'chip-amber'}" style="font-size:10px">${m.s}%</span>
+              </div>`).join('')}
+          </div>
+        </div>
+        <button style="width:100%;background:#1A1208;color:#EBA020;border:none;border-radius:10px;padding:12px;font-weight:800;font-size:13px">🤖 Run AI Forecast</button>
+      </div>`,
+    title: 'AI Cash Flow Forecasting',
+    desc: `Uses Gemini Flash LLM to analyse payment patterns and project collection rates for upcoming cycles. Identifies at-risk members before they miss a payment.`,
+    features: ['Recharts bar chart: projected GHS collection per upcoming cycle','Member reliability scoring (0–100%) using AI','At-risk members flagged in amber with recommendations','Forecast horizon selector: 2 / 4 / 6 cycles','"Run AI Forecast" calls InvokeLLM with live DB data','Powered by Google Gemini Flash via Base44 InvokeLLM integration'],
+    tags: ['AI','Gemini','Forecasting','Analytics','Risk']
+  },
+
+  // ── 12 Circle Analytics ──
+  {
+    label: 'Circle Analytics', icon: '📊', section: 'Analytics',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Circle Analytics</div><div class="sub">Deep operational insights</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          ${[{v:'GHS 5,000',l:'Current Pot'},{v:'83%',l:'Collection Rate'},{v:'1.8 days',l:'Avg Latency'},{v:'Cycle 4',l:'Current Cycle'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:14px">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Pot Growth Over Time</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:4px;height:60px">
+              ${[20,35,28,50,42,60,55,70].map(h=>`<div style="flex:1;background:linear-gradient(to top,#EBA020,#F7C66A);border-radius:2px 2px 0 0;height:${h}px;min-height:2px"></div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Payment Latency (days)</span></div>
+          <div class="card-body">
+            ${[{n:'Ama Owusu',d:0.5},{n:'Yaw Darko',d:0.8},{n:'Abena Frimpong',d:2.1},{n:'Kofi Mensah',d:4.2}].map(m=>`
+              <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">
+                <div style="font-size:11px;width:90px;color:#6B5A3A;flex-shrink:0">${m.n.split(' ')[0]}</div>
+                <div class="prog" style="flex:1"><div class="prog-fill" style="width:${Math.min(m.d/5*100,100)}%;background:${m.d<2?'#1B7A3A':m.d<3?'#EBA020':'#C0392B'}"></div></div>
+                <span style="font-size:11px;font-weight:700;color:#1A1208;width:30px">${m.d}d</span>
+              </div>`).join('')}
+          </div>
+        </div>
+        <button style="width:100%;background:#1A1208;color:#EBA020;border:none;border-radius:10px;padding:12px;font-weight:800;font-size:13px">🔮 Generate AI Projections</button>
+      </div>`,
+    title: 'Circle Analytics',
+    desc: `Data-driven circle health overview with pot growth charts, per-member payment latency, and AI-powered cycle completion projections.`,
+    features: ['Pot balance growth area chart over all transactions','Per-member payment latency bar chart (avg days)','Member payment status breakdown with animated progress bars','AI projections: on-time likelihood %, cycle completion dates','Risk factors summary and organiser recommendations','Powered by Gemini via InvokeLLM'],
+    tags: ['Analytics','Charts','Latency','AI','Projections']
+  },
+
+  // ── 13 Cross-Border Payouts ──
+  {
+    label: 'Cross-Border Payouts', icon: '🌍', section: 'Finance',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Cross-Border Payouts</div><div class="sub">UK Diaspora · FCA Regulated</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Step 2: Review Conversion</span><span class="chip chip-teal">GBP → GHS</span></div>
+          <div class="card-body">
+            <div style="background:#1A1208;border-radius:10px;padding:14px;margin-bottom:10px">
+              <div class="row-between" style="margin-bottom:8px"><span style="color:#C4B080;font-size:12px">Amount Sent (UK)</span><span style="color:#EBA020;font-weight:800;font-size:16px">£500 GBP</span></div>
+              <div class="row-between" style="margin-bottom:8px"><span style="color:#C4B080;font-size:12px">Exchange Rate</span><span style="color:#EBA020;font-weight:700">1 GBP = 18.4 GHS</span></div>
+              <div class="row-between" style="margin-bottom:8px"><span style="color:#C4B080;font-size:12px">FCA Compliance Fee</span><span style="color:#FCE4E4;font-weight:700">- £12.50</span></div>
+              <div style="border-top:1px solid rgba(235,160,32,0.3);padding-top:8px;margin-top:4px" class="row-between">
+                <span style="color:#C4B080;font-size:12px">Recipient Gets</span>
+                <span style="color:#EBA020;font-weight:800;font-size:20px">GHS 9,018</span>
+              </div>
+            </div>
+            <div class="row-between" style="margin-bottom:8px"><span style="font-size:12px;color:#6B5A3A">Recipient MoMo</span><span style="font-weight:700">0244 567 890</span></div>
+            <div class="row-between" style="margin-bottom:8px"><span style="font-size:12px;color:#6B5A3A">UK Bank (last 4)</span><span style="font-weight:700">**** 4821</span></div>
+            <div class="row-between" style="margin-bottom:12px"><span style="font-size:12px;color:#6B5A3A">FCA Reference</span><span style="font-weight:700">FCA-2026-00142</span></div>
+            <button class="btn-gold">✓ Confirm & Submit Payout</button>
+          </div>
+        </div>
+      </div>`,
+    title: 'Cross-Border Payouts',
+    desc: `FCA-regulated payout management for UK and global diaspora members. Handles GBP→GHS conversion with country-specific compliance fees.`,
+    features: ['3-step form: amount entry → conversion review → confirm','Supports UK, US, EU, and AUS diaspora countries','Live exchange rate calculation (GBP → GHS)','FCA compliance fee breakdown per country','UK bank account (last 4 digits) for audit trail','GHS recipient MoMo number','FCA reference number for regulatory records'],
+    tags: ['FCA','GBP','GHS','Diaspora','Compliance','Cross-Border']
+  },
+
+  // ── 14 Insurance ──
+  {
+    label: 'Insurance Management', icon: '🛡', section: 'Finance',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Insurance Claims</div><div class="sub">GLICO Protection</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        ${[
+          {n:'Adom Susu Circle',type:'Missed Payout',status:'under_review',amt:'GHS 3,000',ref:'GLI-2026-0041'},
+          {n:'Efua Asante',type:'Member Default',status:'approved',amt:'GHS 1,500',ref:'GLI-2026-0038'},
+        ].map(c=>{
+          const cs={under_review:{bg:'#D1ECF1',c:'#0C5460',l:'Under Review'},approved:{bg:'#D4EDDA',c:'#155724',l:'✓ Approved'}};
+          const s=cs[c.status];
+          return `<div class="card">
+            <div class="card-header"><span class="ch-title">${c.ref}</span><span class="chip" style="background:${s.bg};color:${s.c};font-size:10px">${s.l}</span></div>
+            <div class="card-body">
+              <div class="row-between"><div><span class="chip chip-amber" style="font-size:10px">${c.type}</span><div style="font-weight:800;font-size:16px;margin-top:4px">${c.amt}</div></div><div style="text-align:right;color:#6B5A3A;font-size:11px">${c.n}</div></div>
+            </div>
+          </div>`;}).join('')}
+        <div class="card">
+          <div class="card-header"><span class="ch-title">New Insurance Claim</span></div>
+          <div class="card-body">
+            <select class="input-mock"><option>Claim Type: Missed Payout</option></select>
+            <input class="input-mock" placeholder="Amount Claimed (GHS)" value="2,000" />
+            <div style="background:#F5F0E8;border:1.5px dashed #E0DBC4;border-radius:8px;padding:14px;text-align:center;margin-bottom:8px">
+              <div style="font-size:20px">📎</div>
+              <div style="font-size:11px;color:#6B5A3A;margin-top:4px">Upload Evidence (PDF/Image)</div>
+            </div>
+            <button class="btn-gold">Submit Claim</button>
+          </div>
+        </div>
+      </div>`,
+    title: 'GLICO Insurance Management',
+    desc: `Insurance claim submission and tracking for circles with GLICO coverage. Members submit evidence for missed payouts, defaults, fraud, or hardship events.`,
+    features: ['5 claim types: Missed Payout, Member Default, Fraud, Death/Hardship, Other','Evidence file upload via Base44 UploadFile integration','Auto-generated claim reference number','Status workflow: Submitted → Under Review → Approved/Rejected → Paid Out','Insurer note field for review comments','Approved payout amount tracked separately'],
+    tags: ['Insurance','GLICO','Claims','Evidence','Protection']
+  },
+
+  // ── 15 Payout Roadmap ──
+  {
+    label: 'Payout Roadmap', icon: '🗺', section: 'Analytics',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Payout Roadmap</div><div class="sub">Full cycle visual timeline</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          ${[{v:'Cycle 4 of 6',l:'Progress'},{v:'GHS 9,000',l:'Distributed'},{v:'2',l:'Remaining'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:12px">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+        </div>
+        ${[1,2,3,4,5,6].map(c=>{
+          const members=['AO','KB','KM','AF','YD','EA'];
+          const done=c<=3;
+          const current=c===4;
+          return `<div style="border:${current?'2px solid #EBA020':'1px solid #E0DBC4'};border-radius:12px;padding:10px 12px;margin-bottom:8px;background:${current?'#FFFDE7':'#fff'}">
+            <div style="font-size:11px;font-weight:700;color:${current?'#B8860B':'#6B5A3A'};margin-bottom:8px">Cycle ${c} ${current?'← Current':done?'✓ Complete':''}</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <div class="av" style="background:${done?'#D4EDDA':current?'#EBA020':'#F5F0E8'};color:${done?'#155724':current?'#1A1208':'#6B5A3A'};font-size:11px">${members[c-1]}</div>
+              <div style="font-size:12px;color:${done?'#aaa':'#1A1208'};text-decoration:${done?'line-through':'none'}">${['Ama Owusu','Kwame Boateng','Yaw Darko','Kofi Mensah','Abena Frimpong','Efua Asante'][c-1]}</div>
+              ${done?'<span class="chip chip-green" style="font-size:10px;margin-left:auto">✓ Paid</span>':current?'<span class="chip chip-ink" style="font-size:10px;margin-left:auto">→ Next</span>':''}
+            </div>
+          </div>`;}).join('')}
+      </div>`,
+    title: 'Visual Payout Roadmap',
+    desc: `A multi-cycle visual timeline showing every member's scheduled payout slot, which have been paid, and which are upcoming — at a glance.`,
+    features: ['Full cycle-by-cycle timeline with member avatars','Current cycle highlighted with gold border','Completed payout slots greyed with strikethrough','Pot balance vs total distributed summary','Cycles remaining count','Accessible from Circle Detail action bar'],
+    tags: ['Roadmap','Timeline','Visual','Cycles','History']
+  },
+
+  // ── 16 Smart Payout ──
+  {
+    label: 'Smart Payout AI', icon: '🤖', section: 'Analytics',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Smart Payout Scheduler</div><div class="sub">AI risk-adjusted ordering</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="background:#1A1208;border-radius:12px;padding:12px;margin-bottom:12px">
+          <div style="color:#EBA020;font-weight:800;font-size:13px;margin-bottom:6px">🤖 AI Recommendation</div>
+          <div style="color:#C4B080;font-size:12px;line-height:1.6">Prioritising members with highest reliability scores to protect pot integrity in early cycles. At-risk members moved to mid-sequence when pot is healthier.</div>
+        </div>
+        ${[
+          {n:'Yaw Darko',pos:1,risk:'low',ts:90,r:'Highest trust score — ideal first recipient'},
+          {n:'Ama Owusu',pos:2,risk:'low',ts:85,r:'Consistently on-time over 6 cycles'},
+          {n:'Abena Frimpong',pos:3,risk:'med',ts:61,r:'2 minor delays — mid-sequence safer'},
+          {n:'Kofi Mensah',pos:4,risk:'high',ts:42,r:'Recent overdue — place after pot is stable'},
+        ].map(m=>{
+          const rc={low:'#155724',med:'#856404',high:'#721C24'};
+          const rb={low:'#D4EDDA',med:'#FFF8E1',high:'#FCE4E4'};
+          return `<div style="background:#fff;border:1px solid #E0DBC4;border-radius:12px;padding:12px;margin-bottom:8px">
+            <div class="row-between" style="margin-bottom:6px">
+              <div class="row"><div style="width:24px;height:24px;border-radius:50%;background:#EBA020;color:#1A1208;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${m.pos}</div><div class="av av-sm" style="margin-left:6px">${m.n.split(' ').map(x=>x[0]).join('')}</div><div style="margin-left:6px;font-weight:700;font-size:13px">${m.n}</div></div>
+              <span class="chip" style="background:${rb[m.risk]};color:${rc[m.risk]};font-size:10px">${m.risk} risk</span>
+            </div>
+            <div style="font-size:11px;color:#6B5A3A;font-style:italic">${m.r}</div>
+          </div>`;}).join('')}
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn-gold" style="flex:2">✓ Accept AI Order</button>
+          <button class="btn-outline" style="flex:1">Override</button>
+        </div>
+      </div>`,
+    title: 'AI Smart Payout Scheduler',
+    desc: `AI-assisted payout prioritisation that analyses member risk profiles and recommends an optimal payout sequence to protect pot integrity.`,
+    features: ['AI-ordered payout queue using trust scores and payment history','Risk tier chip per member: Low / Medium / High','AI rationale text explaining each placement decision','"Accept AI Order" applies sequence directly to DB','"Override" toggle enables manual reordering','Swap Position button for fine-tuned adjustments'],
+    tags: ['AI','Smart Scheduling','Risk','Payout','Optimisation']
+  },
+
+  // ── 17 Guarantor Health ──
+  {
+    label: 'Guarantor Health', icon: '🔒', section: 'Governance',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Guarantor Health</div><div class="sub">Admin only — Risk dashboard</div></div></div>${kente()}</div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div style="background:#FCE4E4;border:1px solid #C0392B;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:#721C24;font-weight:600">🔒 Admin access required to view guarantor risk data</div>
+        ${[
+          {n:'Joseph Osei',linked:3,overdue:1,score:72,risk:'medium',exp:'GHS 4,500'},
+          {n:'Grace Amponsah',linked:2,overdue:0,score:91,risk:'low',exp:'GHS 3,000'},
+          {n:'Samuel Adu',linked:4,overdue:3,score:31,risk:'critical',exp:'GHS 9,000'},
+        ].map(g=>{
+          const rt={low:{bg:'#D4EDDA',c:'#155724'},medium:{bg:'#FFF8E1',c:'#856404'},critical:{bg:'#FCE4E4',c:'#721C24'}};
+          const r=rt[g.risk];
+          return `<div class="card">
+            <div class="card-body">
+              <div class="row-between" style="margin-bottom:8px">
+                <div class="row"><div class="av">${g.n.split(' ').map(x=>x[0]).join('')}</div><div style="margin-left:8px"><div style="font-weight:700;font-size:14px">${g.n}</div><div style="font-size:11px;color:#6B5A3A">${g.linked} members linked · ${g.overdue} overdue</div></div></div>
+                <span class="chip" style="background:${r.bg};color:${r.c}">${g.risk}</span>
+              </div>
+              <div class="prog"><div class="prog-fill" style="width:${g.score}%;background:${g.score>70?'#1B7A3A':g.score>40?'#EBA020':'#C0392B'}"></div></div>
+              <div class="row-between" style="margin-top:6px"><span style="font-size:11px;color:#6B5A3A">Risk Score: ${g.score}/100</span><span style="font-weight:700;font-size:12px">Exposure: ${g.exp}</span></div>
+            </div>
+          </div>`;}).join('')}
+      </div>`,
+    title: 'Guarantor Health Dashboard',
+    desc: `Admin-only risk dashboard that scores every guarantor based on their linked members' payment behaviour, flagging those with critical exposure.`,
+    features: ['Risk score (0–100) per guarantor','Risk tiers: Low / Medium / High / Critical','Linked member count and overdue member count','Total GHS exposure amount','Admin access gate — non-admins see lock screen','Contact Guarantor action button'],
+    tags: ['Guarantor','Admin','Risk','Exposure','Governance']
+  },
+
+  // ── 18 Reconciliation ──
+  {
+    label: 'Reconciliation', icon: '⚖️', section: 'Finance',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Reconciliation</div><div class="sub">End-of-cycle audit</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${[{v:'GHS 3,000',l:'Expected'},{v:'GHS 2,500',l:'Received'},{v:'GHS 500',l:'Shortfall',c:'#C0392B'},{v:'2',l:'Unreconciled'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:14px;${s.c?`color:${s.c}`:''}">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        <div class="card">
+          <div class="card-header"><span class="ch-title">Member Breakdown — Cycle 4</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #E0DBC4">
+              ${['Member','Expected','Paid','Diff'].map(h=>`<div style="font-size:10px;font-weight:700;color:#6B5A3A">${h}</div>`).join('')}
+            </div>
+            ${[
+              {n:'Ama',exp:500,paid:500},{n:'Kwame',exp:500,paid:500},{n:'Kofi',exp:500,paid:0},
+              {n:'Abena',exp:500,paid:500},{n:'Yaw',exp:500,paid:500},{n:'Efua',exp:500,paid:0},
+            ].map(m=>{
+              const diff=m.paid-m.exp;
+              return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;padding:5px 0;border-bottom:1px solid #F5F0E8;align-items:center">
+                <div style="font-size:12px;font-weight:600">${m.n}</div>
+                <div style="font-size:11px">GHS ${m.exp}</div>
+                <div style="font-size:11px">${m.paid?`GHS ${m.paid}`:'—'}</div>
+                <div style="font-size:11px;font-weight:700;color:${diff===0?'#1B7A3A':'#C0392B'}">${diff===0?'✓':`-${m.exp-m.paid}`}</div>
+              </div>`;}).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn-gold" style="flex:1">Mark Cycle Reconciled</button>
+          <button class="btn-outline" style="flex:1">Export Report</button>
+        </div>
+      </div>`,
+    title: 'End-of-Cycle Reconciliation',
+    desc: `Compares expected total collections against actual amounts received. Surfaces shortfalls and unresolved discrepancies for the organiser to act on.`,
+    features: ['Expected vs Actual vs Shortfall summary cards','Per-member breakdown table: expected, paid, difference','Unreconciled items list','Mark Cycle Reconciled button updates Circle entity','Export Report button for record-keeping','Circle and cycle selector to audit any historical cycle'],
+    tags: ['Reconciliation','Audit','Finance','Shortfall','Report']
+  },
+
+  // ── 19 Referral Hub ──
+  {
+    label: 'Referral Hub', icon: '🎁', section: 'Growth',
+    html: () => `
+      <div class="screen-header"><div class="s-inner"><button class="back">←</button><div><div class="title">Referral Hub</div><div class="sub">Earn rewards for growing your circle</div></div></div>${kente()}</div>
+      <div style="background:#1A1208;padding:10px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        ${[{v:6,l:'Total Referrals'},{v:3,l:'Joined'},{v:2,l:'Rewarded'}].map(s=>`<div class="stat-box"><div class="val" style="font-size:16px">${s.v}</div><div class="lbl">${s.l}</div></div>`).join('')}
+      </div>
+      <div class="scroll-inner" style="background:#F7F2E8">
+        ${[
+          {ref:'Ama Owusu',inv:'grace.osei@gmail.com',status:'rewarded',rb:'+5 trust',ib:'GHS 50 credit'},
+          {ref:'Kwame Boateng',inv:'peter.mensah@gmail.com',status:'joined',rb:'Pending',ib:'Pending'},
+          {ref:'Yaw Darko',inv:'linda.asante@gmail.com',status:'pending',rb:'—',ib:'—'},
+        ].map(r=>{
+          const sc={rewarded:{bg:'#D4EDDA',c:'#155724',l:'✓ Rewarded'},joined:{bg:'#D1ECF1',c:'#0C5460',l:'Joined'},pending:{bg:'#FFF8E1',c:'#856404',l:'Pending'}};
+          const s=sc[r.status];
+          return `<div class="card">
+            <div class="card-body">
+              <div class="row-between" style="margin-bottom:6px">
+                <div><div style="font-weight:700;font-size:13px">${r.ref} →</div><div style="font-size:11px;color:#6B5A3A;margin-top:2px">${r.inv}</div></div>
+                <span class="chip" style="background:${s.bg};color:${s.c};font-size:10px">${s.l}</span>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <div style="flex:1;background:#F5F0E8;border-radius:6px;padding:6px 8px"><div style="font-size:10px;color:#6B5A3A">Referrer Bonus</div><div style="font-size:12px;font-weight:700">${r.rb}</div></div>
+                <div style="flex:1;background:#F5F0E8;border-radius:6px;padding:6px 8px"><div style="font-size:10px;color:#6B5A3A">Invitee Bonus</div><div style="font-size:12px;font-weight:700">${r.ib}</div></div>
+              </div>
+            </div>
+          </div>`;}).join('')}
+      </div>`,
+    title: 'Referral & Rewards Hub',
+    desc: `Track member referrals and manage dual-sided rewards. Both the referrer and the new invitee earn bonuses when a referral successfully joins.`,
+    features: ['Dual-sided rewards: referrer and invitee both benefit','Bonus types: Trust Score boost or Contribution Credit (GHS)','Status tracking: Pending → Joined → Rewarded','Summary stats: total referrals, joined count, rewarded count','Referral linked to specific circle','Reward note field for custom messages'],
+    tags: ['Referrals','Rewards','Growth','Trust Boost','Credits']
+  },
+];
+
+let current = 0;
+
+function kente(h=4) {
+  const c=['#EBA020','#1A1208','#2D6A2D','#8B1A1A','#EBA020','#1A1208','#2D6A2D','#8B1A1A'];
+  return `<div class="kente" style="height:${h}px">${c.map(x=>`<div style="background:${x}"></div>`).join('')}</div>`;
+}
+
+function buildSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const sections = [...new Set(SCREENS.map(s => s.section))];
+  let html = '';
+  sections.forEach(sec => {
+    html += `<div class="sidebar-section-label">${sec}</div>`;
+    SCREENS.forEach((s, i) => {
+      if (s.section !== sec) return;
+      html += `<div class="sidebar-item ${i === current ? 'active' : ''}" id="si-${i}" onclick="goTo(${i})">
+        <span class="icon">${s.icon}</span>${s.label}
+      </div>`;
+    });
+  });
+  sidebar.innerHTML = html;
+}
+
+function render() {
+  const s = SCREENS[current];
+
+  // Phone
+  document.getElementById('phoneFrame').innerHTML = s.html();
+
+  // Panel
+  document.getElementById('panelTitle').textContent = s.title;
+  document.getElementById('panelContent').innerHTML = `
+    <div class="highlight-box">
+      <div class="hb-title">What this screen does</div>
+      <p style="color:var(--hint);font-size:12px;line-height:1.7;margin:0">${s.desc}</p>
+    </div>
+    <div style="margin-bottom:12px">
+      ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+    </div>
+    <p style="font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Key Features</p>
+    <ul class="feature-list">
+      ${s.features.map(f => `<li>${f}</li>`).join('')}
+    </ul>
+  `;
+
+  // Progress
+  const pct = ((current + 1) / SCREENS.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('pageCounter').textContent = `${current + 1} / ${SCREENS.length}`;
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === SCREENS.length - 1;
+
+  // Sidebar
+  buildSidebar();
+
+  // Scroll sidebar item into view
+  const el = document.getElementById(`si-${current}`);
+  if (el) el.scrollIntoView({ block: 'nearest' });
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next < 0 || next >= SCREENS.length) return;
+  current = next;
+  render();
+}
+
+function goTo(idx) {
+  current = idx;
+  render();
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+});
+
+render();
+</script>
+</body>
+</html>
