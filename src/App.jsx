@@ -32,6 +32,7 @@ import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 import ReconciliationPage from './pages/ReconciliationPage';
 import CircleAnalyticsPage from './pages/CircleAnalyticsPage';
 import PayoutTimeline from './pages/PayoutTimeline';
+import Walkthrough from './pages/Walkthrough';
 
 
 const pageVariants = {
@@ -105,6 +106,7 @@ const AuthenticatedApp = () => {
           <Route path="/reconciliation" element={<PageSlide><ReconciliationPage /></PageSlide>} />
           <Route path="/circle-analytics" element={<PageSlide><CircleAnalyticsPage /></PageSlide>} />
           <Route path="/payout-timeline" element={<PageSlide><PayoutTimeline /></PageSlide>} />
+          <Route path="/walkthrough" element={<Walkthrough />} />
           <Route path="/register" element={<PageSlide><Registration /></PageSlide>} />
           <Route path="/settings" element={<PageSlide><Settings /></PageSlide>} />
           <Route path="/handover" element={<HandoverDoc />} />
