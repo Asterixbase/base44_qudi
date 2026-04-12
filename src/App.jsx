@@ -31,6 +31,7 @@ import GuarantorHealth from './pages/GuarantorHealth';
 import SmartPayoutScheduler from './pages/SmartPayoutScheduler';
 import ReconciliationPage from './pages/ReconciliationPage';
 import CircleAnalyticsPage from './pages/CircleAnalyticsPage';
+import PayoutTimeline from './pages/PayoutTimeline';
 
 
 const pageVariants = {
@@ -103,6 +104,7 @@ const AuthenticatedApp = () => {
           <Route path="/smart-payout" element={<PageSlide><SmartPayoutScheduler /></PageSlide>} />
           <Route path="/reconciliation" element={<PageSlide><ReconciliationPage /></PageSlide>} />
           <Route path="/circle-analytics" element={<PageSlide><CircleAnalyticsPage /></PageSlide>} />
+          <Route path="/payout-timeline" element={<PageSlide><PayoutTimeline /></PageSlide>} />
           <Route path="/register" element={<PageSlide><Registration /></PageSlide>} />
           <Route path="/settings" element={<PageSlide><Settings /></PageSlide>} />
           <Route path="/handover" element={<HandoverDoc />} />
