@@ -1,0 +1,37 @@
+{
+  "name": "Auto Payout \u2014 On Member Payment",
+  "description": "Fires whenever a member's payment_status changes to 'paid'. Checks if the circle's cycle target is now complete and triggers payout immediately if so \u2014 no need to wait for the hourly check.",
+  "trigger": {
+    "condition": "${ ((.trigger.data.payment_status == \"paid\") and (.trigger.changed_fields | index(\"payment_status\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Member"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_payout_on_member_payment",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoPayoutJob",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "autoPayoutJob"
+  }
+}
